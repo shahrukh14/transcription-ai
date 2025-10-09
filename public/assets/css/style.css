@@ -1,0 +1,19 @@
+.breadcrumbs-top a {
+    width: auto;
+}
+.flatpickr-time {
+    height: auto !important;
+}
+select[readonly] {
+    pointer-events: none;
+}
+
+.main-menu .navbar-header .navbar-brand {
+    display: inline-block;
+    align-items: center;
+    margin-top: 0;
+    font-size: inherit;
+}
+label.form-label{
+    font-weight: bold;
+}

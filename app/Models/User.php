@@ -47,7 +47,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function fullname($client){
-        return $client->firstname." ".$client->lastname;
+    public function fullName(){
+        return $this->first_name." ".$this->last_name;
     }
 }

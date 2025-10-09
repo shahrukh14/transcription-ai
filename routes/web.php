@@ -1,21 +1,29 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ShiftController;
-use App\Http\Controllers\Auth\UserLogincontroller;
-use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\ReaderController;
 use App\Http\Controllers\DynamicController;
 use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\TestimonialController;
-use App\Http\Controllers\GeneralsettingsController;
-use App\Http\Controllers\RoleAndPermissionController;
 use App\Http\Controllers\WebsiteController;
-use App\Http\Controllers\TestController;
+use App\Http\Controllers\PackagesController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProofReaderController;
+use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\Auth\UserLogincontroller;
+use App\Http\Controllers\GeneralsettingsController;
+use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\RoleAndPermissionController;
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +35,6 @@ use App\Http\Controllers\TestController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
 
 
 Route::get('test/api', [TestController::class, 'testApi'])->name('test.api');
@@ -62,7 +69,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('add-role', [RoleAndPermissionController::class, 'addRole'])->name('add-role');
         Route::post('change-role-status', [RoleAndPermissionController::class, 'changeRoleStatus'])->name('change-role-status');
 
-         //Faq
+        //Faq
         Route::get('faq-list', [FaqController::class, 'faqList'])->name('faq.list');
         Route::get('faq-form', [FaqController::class, 'faqcreate'])->name('faq.form');
         Route::post('faq-add', [FaqController::class, 'faqadd'])->name('faq.add');
@@ -70,14 +77,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('faq-update/{id}', [FaqController::class, 'faqupdate'])->name('faq.update');
         Route::get('faq-delete/{id}', [FaqController::class, 'faqdelete'])->name('faq.delete');
         //Blog
-         Route::get('blog-list', [BlogController::class, 'index'])->name('blog.list');
-         Route::get('blog-form', [BlogController::class, 'create'])->name('blog.form');
-         Route::post('blog-form', [BlogController::class, 'store']);
-         Route::get('blog/edit/{id}', [BlogController::class, 'edit'])->name('blog.edit');
-         Route::put('blog/{id}', [BlogController::class, 'update'])->name('blog.update');
-         Route::get('blog/{id}', [BlogController::class, 'destroy'])->name('blog.destroy');
+        Route::get('blog-list', [BlogController::class, 'index'])->name('blog.list');
+        Route::get('blog-form', [BlogController::class, 'create'])->name('blog.form');
+        Route::post('blog-form', [BlogController::class, 'store']);
+        Route::get('blog/edit/{id}', [BlogController::class, 'edit'])->name('blog.edit');
+        Route::put('blog/{id}', [BlogController::class, 'update'])->name('blog.update');
+        Route::get('blog/{id}', [BlogController::class, 'destroy'])->name('blog.destroy');
 
-         //testimonial   
+        //testimonial   
         Route::get('testimonial-list', [TestimonialController::class, 'testimoniallisting'])->name('testimonial.list');
         Route::get('testimonial-form', [TestimonialController::class, 'testimonialcreate'])->name('testimonial.form');
         Route::post('testimonial-form', [TestimonialController::class, 'testimonialstore']);
@@ -102,8 +109,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('gallery-delete/{id}', [GalleryController::class, 'galleryDelete'])->name('gallery.delete');
 
         //add photo
-         Route::get('photo/{id}', [PhotoController::class, 'photo'])->name('photo');
-         Route::post('photo/add/{id}', [PhotoController::class, 'photoAdd'])->name('photo.add');
+        Route::get('photo/{id}', [PhotoController::class, 'photo'])->name('photo');
+        Route::post('photo/add/{id}', [PhotoController::class, 'photoAdd'])->name('photo.add');
         Route::get('delete/{id}', [PhotoController::class, 'PhotoDelete'])->name('photo.delete');
          
         // banner image
@@ -119,6 +126,37 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('assign-permissions-to-role/{role_name}', [RoleAndPermissionController::class, 'assignPermissionForm'])->name('assign-permissions-to-role');
         Route::post('assign-permissions', [RoleAndPermissionController::class, 'assignPermissions'])->name('assign-permissions');
+
+        //Customers
+        Route::prefix('customers')->name('customers.')->group(function () {
+            Route::get('/', [CustomerController::class, 'list'])->name('list');
+            Route::get('add', [CustomerController::class, 'add'])->name('add');
+            Route::post('insert', [CustomerController::class, 'insert'])->name('insert');
+            Route::get('edit/{id}', [CustomerController::class, 'edit'])->name('edit');
+            Route::post('update/{id}', [CustomerController::class, 'update'])->name('update');
+            Route::get('delete/{id}', [CustomerController::class, 'delete'])->name('delete');
+        });
+
+        //Proof Reader
+         Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
+            Route::get('/', [ProofReaderController::class, 'list'])->name('list');
+            Route::get('add', [ProofReaderController::class, 'add'])->name('add');
+            Route::post('insert', [ProofReaderController::class, 'insert'])->name('insert');
+            Route::get('edit/{id}', [ProofReaderController::class, 'edit'])->name('edit');
+            Route::post('update/{id}', [ProofReaderController::class, 'update'])->name('update');
+            Route::get('delete/{id}', [ProofReaderController::class, 'delete'])->name('delete');
+        });
+
+        //Packages
+        Route::prefix('package')->name('package.')->group(function () {
+            Route::get('/', [PackagesController::class, 'list'])->name('list');
+            Route::get('add', [PackagesController::class, 'add'])->name('add');
+            Route::post('insert', [PackagesController::class, 'insert'])->name('insert');
+            Route::get('edit/{id}', [PackagesController::class, 'edit'])->name('edit');
+            Route::post('update/{id}', [PackagesController::class, 'update'])->name('update');
+            Route::get('delete/{id}', [PackagesController::class, 'delete'])->name('delete');
+        });
+
         //Spatie Protected Routes
         Route::middleware(['permission'])->group(function () {
         });
@@ -136,5 +174,15 @@ Route::prefix('user')->name('user.')->group(function () {
         //Protected Route start
         Route::get('dashboard', [UserController::class, 'dashboard'])->name('dashboard');
         Route::get('logout', [UserController::class, 'logout'])->name('logout');
+    });
+});
+
+Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
+    Route::get('login', [ReaderController::class, 'login'])->name('login');
+    Route::post('login/submit', [ReaderController::class, 'loginSubmit'])->name('login.submit');
+    Route::middleware(['auth:reader'])->group(function () {
+        //Protected Route start
+        Route::get('dashboard', [ReaderController::class, 'dashboard'])->name('dashboard');
+        Route::get('logout', [ReaderController::class, 'logout'])->name('logout');
     });
 });

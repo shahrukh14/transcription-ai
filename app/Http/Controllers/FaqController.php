@@ -7,16 +7,16 @@ use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
-        public function faqList(Request $request){
+    public function faqList(Request $request){
         $query = Faq::query();
         $search = $request->input('search');
         if ($request->has('search')) {
-           $query->where('title', 'LIKE', "%$search%");
+            $query->where('title', 'LIKE', "%$search%");
         }
         $query->orderBy('id', 'DESC');
         $faqs = $query->paginate(10);
         return view('admin.Faq.list',compact('faqs','search'));
-        }
+    }
         public function faqcreate(){
         return view('admin.Faq.add');
         }
