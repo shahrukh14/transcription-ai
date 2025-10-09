@@ -13,12 +13,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // For Super Admin
         \App\Models\Admin::create([
             'first_name' => 'Super',
             'last_name' => 'Admin',
             'email'=>'admin@gmail.com',
             'password'=>Hash::make('password'),
         ]);
+        
+        // For Admin
         \App\Models\Admin::create([
             'first_name' => 'Jhon',
             'last_name' => 'Doe',

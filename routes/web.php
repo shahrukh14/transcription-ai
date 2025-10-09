@@ -15,6 +15,7 @@ use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\GeneralsettingsController;
 use App\Http\Controllers\RoleAndPermissionController;
 use App\Http\Controllers\WebsiteController;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +30,7 @@ use App\Http\Controllers\WebsiteController;
 
 
 
+Route::get('test/api', [TestController::class, 'testApi'])->name('test.api');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', [AdminLoginController::class, 'login'])->name('login');

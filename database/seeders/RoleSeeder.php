@@ -9,11 +9,11 @@ use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
-  public function run(): void
-  {
-    $roles = ['Admin'];
-    foreach ($roles as $role) {
-      Role::create(['name' => $role, 'guard_name' => 'admin']);
+    public function run(): void
+    {
+        $roles = ['Admin'];
+        foreach ($roles as $role) {
+            Role::create(['name' => $role, 'guard_name' => 'admin']);
+        }
     }
-  }
 }

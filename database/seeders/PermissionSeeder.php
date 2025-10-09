@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Route;
+
 class PermissionSeeder extends Seeder
 {
     /**
@@ -13,18 +15,21 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-        //Assign All Permissions Here
-        $permissions = [
-            'admin.dashboard',
-            'admin.user-list',
-            'admin.add-user',
-            'admin.edit-user',
-            'admin.update-user',
-            'admin.delete-user',
-        ];
+        // All Route Permissions 
+        $routes = Route::getRoutes();
+        foreach($routes as $route){
+            $routeName = $route->getName();
+            $action = $route->getAction();
+            // Get the prefix from the route action
+            $routeGroup = isset($action['prefix']) ? $action['prefix'] : null;
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission,'guard_name'=>'admin']);
+            if($routeName){
+                Permission::firstOrCreate([
+                    'name' => $routeName,
+                    'guard_name' => 'admin',
+                    'group' => $routeGroup
+                ]);
+            }
         }
     }
 }
