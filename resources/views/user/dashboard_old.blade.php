@@ -1,97 +1,96 @@
 @extends('user.layouts.layout')
 @section('title', 'Dashboard')
 @section('content')
-<!-- BEGIN: Content-->
-<div class="app-content content ">
-    <div class="content-overlay"></div>
-    <div class="header-navbar-shadow"></div>
-    <div class="content-wrapper container-xxl p-0">
-        <div class="content-header row"></div>
-        <div class="content-body">
-            <div class="row">
-                <div class="col-xl-3 col-md-3 col-12">
-                    <div class="card">
-                        <div class="card-header bg-black">
-                            @php
-                                if(auth()->user()->audioTrascriptionWithCurrentPackage() && auth()->user()->currentSubscription->transcription_limit){
-                                    $percentage = (auth()->user()->audioTrascriptionWithCurrentPackage() / auth()->user()->currentSubscription->transcription_limit) * 100;
-                                    $text = auth()->user()->audioTrascriptionWithCurrentPackage() ." of " .auth()->user()->currentSubscription->transcription_limit." transcriptions used";
-                                }else{
-                                    $percentage = 0;
-                                    $text = "No Subscription plan found";
-                                }
-                            @endphp
-                            <div class="w-100 text-center">
-                                <p class="text-white fw-bolder mb-2">{{$text}}</p>
-                                <div class="progress progress-bar-primary mb-2">
-                                    <div class="progress-bar" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="{{$percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+    <!-- BEGIN: Content-->
+    <div class="app-content content">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper container-xxl p-0">
+            <div class="content-body">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-6">
+                        <div class="card">
+                            <div class="bg-dark text-center">
+                                <div class="p-4">
+                                    @php
+                                        if(auth()->user()->audioTrascriptionWithCurrentPackage() && auth()->user()->currentSubscription->transcription_limit){
+                                            $percentage = (auth()->user()->audioTrascriptionWithCurrentPackage() / auth()->user()->currentSubscription->transcription_limit) * 100;
+                                            $text = auth()->user()->audioTrascriptionWithCurrentPackage() ." of " .auth()->user()->currentSubscription->transcription_limit." transcriptions used";
+                                        }else{
+                                            $percentage = 0;
+                                            $text = "No Subscription plan found";
+                                        }
+                                    @endphp
+                                    <p class="text-white">{{$text}}</p>
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar" role="progressbar" style="width: {{$percentage}}%" aria-valuenow="{{$percentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <a href="{{ route('pricing') }}" class="rts-btn btn__long border__white white__color">GO UNLIMITED</a>
                                 </div>
-                                <a href="{{ route('pricing') }}" class="btn btn-outline-primary">GO UNLIMITED</a>
                             </div>
-                        </div>
-                        <div class="card-body pt-2">
-                            <h4>Shortcuts</h4>
-                            <ul class="list-group mb-1">
-                                <li class="list-group-item">
-                                    <i class="fa-solid fa-bars"></i> Recent Files
-                                </li>
-                            </ul>
-                            <h4>Folders</h4>
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                    <i class="fa-solid fa-folder-plus"></i> Folders
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-9 col-md-9 col-12">
-                    <div class="card">
-                        <div class="card-header pb-0">
-                            <h4 class="card-title">
-                                <i class="fa-solid fa-bars"></i>  Recent Files
-                            </h4>
-                        </div><hr>
-                        <div class="card-body">
-                            <div class="text-center p-1">
-                                <h2 class="mb-1">Welcome to TranScribe</h2>
-                                <button type="button" class="btn btn-primary p-2 w-25 fw-bolder" data-bs-toggle="modal" data-bs-target="#dropZoneModal">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i> Transcribe Your File
-                                </button>
+                            <div class="card-body">
+                                <h5 class="card-title">Shortcuts</h5>
+                                <p class="card-text p-2 bg-gray rounded text-start">
+                                    <i class="fa-solid fa-bars"></i>
+                                    Recent Files
+                                </p>
+                                <h5 class="card-title">Folders</h5>
+                                <p class="card-text p-2 bg-gray rounded text-start">
+                                    <i class="fa-solid fa-folder-plus"></i>
+                                    Folders
+                                </p>
                             </div>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <div class="card-header pb-0">
-                            <h4 class="card-title">
-                                <i class="fa-solid fa-bars"></i> Uploaded Files
-                            </h4>
-                        </div><hr>
-                        <div class="card-body">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Name</th>
-                                        <th scope="col">Uploaded</th>
-                                        <th scope="col">Duration</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tableBody">
-                                    {{-- Transcriptions Table Will be render here by AJAX--}}
-                                </tbody>
-                              </table>
+                    <div class="col-lg-9 col-md-9 col-sm-6">
+                        <div class="card w-100 mb-4">
+                            <div class="card-header">
+                                <h4 class="card-title">
+                                    <i class="fa-solid fa-bars"></i>
+                                    Recent Files
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center p-4">
+                                    <h4 class="card-title">Welcome to TranScribe</h4>
+                                    <button type="button" class="rts-btn btn__long primary__bg white__color mt-2" data-bs-toggle="modal" data-bs-target="#dropZoneModal" style="width: 35%;">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>Transcribe Your First File
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="card w-100 mb-4">
+                            <div class="card-header">
+                                <h4 class="card-title">
+                                    <i class="fa-solid fa-bars"></i>
+                                    Uploaded Files
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Uploaded</th>
+                                            <th scope="col">Duration</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        {{-- Transcriptions Table Will be render here by AJAX--}}
+                                    </tbody>
+                                  </table>
+                            </div>
+                        </div>
+                        
                     </div>
-                </div>
+                </div>   
             </div>
         </div>
     </div>
-</div>
-<!-- END: Content-->
+    <!-- END: Content-->
 @endsection
 
 @push('modal')
@@ -108,26 +107,27 @@
                 <div id="audioDropzone" data-upload-url="{{ route('user.audio.upload') }}">
                     <div class="dz-message" data-dz-message>
                         <h4 style="margin-bottom: 5px;">Drag and Drop</h4>
-                        <span style="font-size: 10px">MP3, WAV, FLAC, AAC, OPUS, OGG, M4A, MP4, MPEG, MOV, WEBM</span>
+                        <span style="font-size: 12px">MP3, WAV, FLAC, AAC, OPUS, OGG, M4A, MP4, MPEG, MOV, WEBM</span>
                         <h6>---OR---</h6>
-                        <button type="button" class="btn btn-outline-secondary">Browse Files</button>
+                        <button type="button" class="btn btn-outline-secondary w-25">Browse Files</button>
                     </div>
-                    <div class="progress mt-1">
+                    <div class="progress mt-4" style="height: 18px;">
                         <div class="progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                     </div>
                 </div>
-                <div class="row mt-1">
-                    <div class="col-md-12 mb-1">
-                        <label class="form-label" for="select2-basic">Select Audio Language</label>
-                        <select class="select2 form-select languageSelect" id="select2-basic">
+                <div class="otherElements">
+                    <div class="mb-4">
+                        <label for="languageSelect" class="form-label fw-semibold mb-2">Select Audio Language</label>
+                        <select class="form-control mb-1 select2" id="languageSelect">
+                            <option value="">Select</option>
                             @foreach ($languages as $language)
                                 <option value="{{$language}}">{{Illuminate\Support\Str::ucfirst($language)}}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-12 mb-1">
-                        <label for="speakers" class="form-label">How many speakers?</label>
-                        <select class="select2 form-select" id="speakers" aria-label="Speaker count selection">
+                    <div class="mb-4">
+                        <label for="speakers" class="form-label fw-semibold mb-2">How many speakers?</label>
+                        <select class="form-control" id="speakers" aria-label="Speaker count selection">
                             <option selected disabled>Select number of speakers</option>
                             <option value="2">2 speakers</option>
                             <option value="3">3 speakers</option>
@@ -139,16 +139,14 @@
                             <option value="-1">Detect Automatically</option>
                         </select>
                     </div>
-                    <div class="col-md-12">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="transcribe_to_english" name="transcribe_to_english" value="1" />
-                            <label class="form-check-label fw-bolder" for="transcribe_to_english">Transcribe to English</label>
-                        </div>
+                    <div class="check-box-area mb-4">
+                        <input type="checkbox" id="transcribe_to_english" name="transcribe_to_english" value="1"/>
+                        <label for="transcribe_to_english" class="form-label fw-semibold mb-2">Transcribe to English</label>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="uploadBtn" class="btn btn-primary">Upload</button>
+                <button type="button" id="uploadBtn" class="btn btn-primary py-2">Upload</button>
             </div>
         </div>
     </div>
@@ -162,20 +160,20 @@
             <form action="{{ route('user.transcription.file.rename') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h4 class="modal-title text-center" id="fileRenameModalLabel"><i class="fa-solid fa-pen-to-square"></i> Rename File</h4>
+                    <h6 class="modal-title text-center" id="fileRenameModalLabel">Rename File</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label for="renameFile" class="form-label">Name</label>
+                <div class="modal-body p-4">
+                    <div class="otherElements">
+                        <div class="mb-4">
+                            <label for="languageSelect" class="form-label fw-semibold mb-2">Name</label>
                             <input type="text" class="form-control mb-1" name="name" id="renameFile" placeholder="Enter new file name">
                             <input type="hidden" id="transcription_id" name="transcription_id">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Rename</button>
+                    <button type="submit" class="btn btn-primary py-2">Rename</button>
                 </div>
             </form>
         </div>
@@ -196,10 +194,11 @@
         background-color: #e0e3e7 !important;
     }
     #audioDropzone {
+        min-height: 200px;
         border: 2px dashed #ccc;
         border-radius: 10px;
         background-color: #f9f9f9;
-        padding: 15px;
+        padding: 30px;
         text-align: center;
         color: #555;
         font-size: 16px;
@@ -268,21 +267,26 @@
     .tableRow{
         border-bottom: #333;
     }
+
+    .otherElements{
+        margin-top: 10px;
+    }
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: .775rem 1.75rem;
+        font-size: 1.5rem;
+        font-weight: 400;
+        line-height: 1.8;
+    }
 </style>
 @endpush
 
+
 @push('script')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
 <script> 
 $(document).ready(function () {
-
-    //select2 initialization
-    $('.select2').select2({
-        placeholder: "Select",
-        allowClear: true,
-        dropdownParent: $('#select2-basic').parent()
-    });
 
     // Get Transcription function call on page load
     renderTranscriptionTable();
@@ -363,7 +367,7 @@ $(document).ready(function () {
                     }
 
                     // Validate language and speakers
-                    let language = $('.languageSelect').val();
+                    let language = $('#languageSelect').val();
                     let speakers = $('#speakers').val();
                     let transcribeToEnglish = 0;
                     if ($('#transcribe_to_english').is(':checked')){
@@ -443,4 +447,3 @@ $(document).ready(function () {
 });
 </script>
 @endpush
-    

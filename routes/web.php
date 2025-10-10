@@ -24,6 +24,7 @@ use App\Http\Controllers\TranscriptionController;
 use App\Http\Controllers\Auth\UserLogincontroller;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\GeneralsettingsController;
+use App\Http\Controllers\ProofReader\TaskController;
 use App\Http\Controllers\RoleAndPermissionController;
 
 
@@ -184,7 +185,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-
 Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::get('pricing', [HomeController::class, 'pricing'])->name('pricing');
 Route::get('faqs', [HomeController::class, 'faqs'])->name('faqs');
@@ -217,9 +217,12 @@ Route::prefix('user')->name('user.')->group(function () {
             Route::get('view/{transcription}', [TranscriptionController::class, 'viewTranscription'])->name('view');
             Route::get('edit/{transcription}', [TranscriptionController::class, 'editTranscription'])->name('edit');
             Route::post('update/{id}', [TranscriptionController::class, 'updateTranscription'])->name('update');
+            Route::post('update/segment/{id}', [TranscriptionController::class, 'updateTranscriptionSegment'])->name('segment.update');
             Route::get('pdf/download/{transcription}', [TranscriptionController::class, 'transcriptionPDFdownload'])->name('pdf.download');
             Route::get('docx/download/{transcription}', [TranscriptionController::class, 'transcriptionDOCXdownload'])->name('docx.download');
             Route::get('delete/{transcription}', [TranscriptionController::class, 'deleteTranscription'])->name('delete');
+            Route::get('app-to-proof-reading/{id}', [TranscriptionController::class, 'appToProofReading'])->name('app.to.proof.reading');
+            Route::post('file-rename', [TranscriptionController::class, 'renameFile'])->name('file.rename');
         });
     });
 });
@@ -233,6 +236,12 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
         //Protected Route start
         Route::get('dashboard', [ReaderController::class, 'dashboard'])->name('dashboard');
         Route::get('logout', [ReaderController::class, 'logout'])->name('logout');
+    });
+
+    // Tasks Route
+    Route::prefix('tasks')->name('tasks.')->group(function () {
+        Route::get('/', [TaskController::class, 'list'])->name('list');
+        Route::get('claimed-by-proof-reader/{id}', [TaskController::class, 'claimedByProofReader'])->name('claimed.by.proof.reader');
     });
 });
 

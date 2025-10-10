@@ -1,11 +1,11 @@
  <!--HEADER INCLUDE-->
  @include('user.layouts.header')
 
+ <!--SIDEBAR INCLUDE-->
+ @include('user.layouts.navbar')
+
  <!--MAIN CONTENT -->
  @yield('content')
-
- <!--SIDEBAR INCLUDE-->
- @include('user.layouts.sidebar')
 
  <!--FOOTER INCLUDE-->
  @include('user.layouts.footer')

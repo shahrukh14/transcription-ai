@@ -3,138 +3,116 @@
 <!-- BEGIN: Head-->
 
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
     <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
     <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
-    <link rel="canonical" href="https://html.themewant.com/hostie">
-    <meta name="robots" content="index, follow">
-    <!-- for open graph social media -->
-    <meta property="og:title" content="Hostie - Web Hosting & WHMCS Template">
-    <meta property="og:description" content="Your Ultimate Solution for Web Hosting & WHMCS">
-    <meta property="og:image" content="https://www.example.com/image.jpg">
-    <meta property="og:url" content="https://html.themewant.com/hostie/">
-    <!-- for twitter sharing -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Hostie - Web Hosting & WHMCS Template">
-    <meta name="twitter:description" content="Your Ultimate Solution for Web Hosting & WHMCS">
-    <meta name="twitter:image" content="https://html.themewant.com/hostie/landing/assets/images/banner/slider-img-01.webp">
-    <!-- favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('user-assets/images/fav.png') }}">
-
-    <title>@yield('title')</title>
-    <!-- Preconnect to Google Fonts and Google Fonts Static -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Importing Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,500;0,600;0,700;1,400;1,800&display=swap" rel="stylesheet">
-    <!-- all styles -->
-    <link rel="preload stylesheet" href="{{ asset('user-assets/css/plugins.min.css') }}" as="style">
-    <!-- fontawesome css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-    <!-- Bootstrap css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
-    <!-- Custom css -->
-    <link rel="preload stylesheet" href="{{ asset('user-assets/css/style.css') }}" as="style">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>@yield('title')</title>
+    <link rel="apple-touch-icon" href="{{asset('app-assets/images/ico/apple-icon-120.png')}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset('app-assets/images/ico/favicon.ico')}}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
 
-    <style>
-        .swal2-popup.swal2-modal {
-            font-size: 14px;
-        }
+    <!-- BEGIN: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/vendors.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/charts/apexcharts.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/extensions/toastr.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/forms/select/select2.min.css')}}">
+    <!-- END: Vendor CSS-->
 
+    <!-- BEGIN: Theme CSS-->
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/bootstrap.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/bootstrap-extended.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/colors.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/components.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/themes/dark-layout.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/themes/bordered-layout.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/themes/semi-dark-layout.css')}}">
 
-      
-        /* Style the visible select */
-        .select2-selection {
-            height: 38px !important;
-            padding: 5px 10px !important;
-            border: 1px solid #ced4da !important;
-            border-radius: 4px !important;
-        }
+    <!-- BEGIN: Page CSS-->
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/core/menu/menu-types/horizontal-menu.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/pages/dashboard-ecommerce.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/charts/chart-apex.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/extensions/ext-component-toastr.css')}}">
+    <!-- END: Page CSS-->
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"  crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        /* Fix dropdown positioning */
-        .select2-dropdown {
-            z-index: 99999 !important;
-        }
-        #languageSelect .nice-select{
-            display: none !important;
-        }
-    </style>
+    <!-- BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/style.css')}}">
+    <!-- END: Custom CSS-->
     @stack('style')
 </head>
 <!-- END: Head-->
+
 <!-- BEGIN: Body-->
+<body class="horizontal-layout horizontal-menu  navbar-floating footer-static  " data-open="hover" data-menu="horizontal-menu" data-col="">
 
-<body>
-    <header class="rts-header header__with__bg header__default">
-        <!-- HEADER TOP AREA END -->
-        <div class="rts-menu">
-            <div class="container">
-                <div class="row">
-                    <div class="rts-header__wrapper">
-                        <!-- FOR LOGO -->
-                        @php
-                        $dynamicpages = App\Models\Dynamic::first();
-                        $existingSettings = App\Models\Generalsettings::first();
-                        @endphp
-                        <div class="rts-header__logo mt-5">
-                            <a href="{{ route('home') }}" class="site-logo">
-                                @if($existingSettings && $existingSettings->logo != null)
-                                <a class="navbar-brand coustem-navbar-brand" style="height: 100% ; margin:0px;" href="{{route('admin.dashboard')}}"> <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" style="height: 29px " alt=""></span>
-                                    <h2 class="brand-text"></h2>
-                                </a>
-                                @endif
-
-                            </a>
-                        </div>
-                        <!-- FOR NAVIGATION MENU -->
-                        <nav class="rts-header__menu" id="mobile-menu">
-                            <div class="hostie-menu">
-                                <ul class="list-unstyled hostie-desktop-menu">
-                                    <li class="menu-item">
-                                        <a href="{{ route('home') }}" class="hostie-dropdown-main-element">Home</a>
-                                    </li>
-                                    @if($dynamicpages != null)
-                                    <li class="menu-item">
-                                        <a href="{{ route('page', ['slug' => $dynamicpages->slug]) }}" class="hostie-dropdown-main-element">About Us</a>
-                                    </li>
-                                    @endif
-                                    <li class="menu-item">
-                                        <a href="{{ route('pricing') }}" class="hostie-dropdown-main-element">Pricing</a>
-                                    </li>
-                                    <li class="menu-item">
-                                        <a href="{{ route('faqs') }}" class="hostie-dropdown-main-element">FAQs</a>
-                                    </li>
-                                    <li class="menu-item">
-                                        <a href="{{ route('blog') }}" class="hostie-dropdown-main-element">Blog</a>
-                                    </li>
-                                    <li class="menu-item">
-                                        <a href="{{ route('contact') }}" class="hostie-dropdown-main-element">Contact Us</a>
-                                    </li>
-
-                                </ul>
-                            </div>
-                        </nav>
-                        <!-- FOR HEADER RIGHT -->
-                        <div class="rts-header__right">
-                            @auth
-                            <a href="{{ route('user.logout') }}" class="login__btn">Logout</a>
-                            @else
-                            <a href="{{ route('login') }}" class="login__btn">Sign In</a>
-                            @endauth
-                            <button id="menu-btn" class="mobile__active menu-btn"><i class="fa-sharp fa-solid fa-bars"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- BEGIN: Header-->
+    <nav class="header-navbar navbar-expand-lg navbar navbar-fixed align-items-center navbar-shadow navbar-brand-center" data-nav="brand-center">
+        <div class="navbar-header d-xl-block d-none">
+            <ul class="nav navbar-nav">
+                <li class="nav-item">
+                    <a class="navbar-brand" href="{{ route('user.dashboard')}}">
+                        <span class="brand-logo">
+                            <svg viewbox="0 0 139 95" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="24">
+                                <defs>
+                                    <lineargradient id="linearGradient-1" x1="100%" y1="10.5120544%" x2="50%" y2="89.4879456%">
+                                        <stop stop-color="#000000" offset="0%"></stop>
+                                        <stop stop-color="#FFFFFF" offset="100%"></stop>
+                                    </lineargradient>
+                                    <lineargradient id="linearGradient-2" x1="64.0437835%" y1="46.3276743%" x2="37.373316%" y2="100%">
+                                        <stop stop-color="#EEEEEE" stop-opacity="0" offset="0%"></stop>
+                                        <stop stop-color="#FFFFFF" offset="100%"></stop>
+                                    </lineargradient>
+                                </defs>
+                                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <g id="Artboard" transform="translate(-400.000000, -178.000000)">
+                                        <g id="Group" transform="translate(400.000000, 178.000000)">
+                                            <path class="text-primary" id="Path" d="M-5.68434189e-14,2.84217094e-14 L39.1816085,2.84217094e-14 L69.3453773,32.2519224 L101.428699,2.84217094e-14 L138.784583,2.84217094e-14 L138.784199,29.8015838 C137.958931,37.3510206 135.784352,42.5567762 132.260463,45.4188507 C128.736573,48.2809251 112.33867,64.5239941 83.0667527,94.1480575 L56.2750821,94.1480575 L6.71554594,44.4188507 C2.46876683,39.9813776 0.345377275,35.1089553 0.345377275,29.8015838 C0.345377275,24.4942122 0.230251516,14.560351 -5.68434189e-14,2.84217094e-14 Z" style="fill:currentColor"></path>
+                                            <path id="Path1" d="M69.3453773,32.2519224 L101.428699,1.42108547e-14 L138.784583,1.42108547e-14 L138.784199,29.8015838 C137.958931,37.3510206 135.784352,42.5567762 132.260463,45.4188507 C128.736573,48.2809251 112.33867,64.5239941 83.0667527,94.1480575 L56.2750821,94.1480575 L32.8435758,70.5039241 L69.3453773,32.2519224 Z" fill="url(#linearGradient-1)" opacity="0.2"></path>
+                                            <polygon id="Path-2" fill="#000000" opacity="0.049999997" points="69.3922914 32.4202615 32.8435758 70.5039241 54.0490008 16.1851325"></polygon>
+                                            <polygon id="Path-21" fill="#000000" opacity="0.099999994" points="69.3922914 32.4202615 32.8435758 70.5039241 58.3683556 20.7402338"></polygon>
+                                            <polygon id="Path-3" fill="url(#linearGradient-2)" opacity="0.099999994" points="101.428699 0 83.0667527 94.1480575 130.378721 47.0740288"></polygon>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                        </span>
+                        <h2 class="brand-text mb-0">TranScribe</h2>
+                    </a>
+                </li>
+            </ul>
         </div>
-    </header>
+        <div class="navbar-container d-flex content">
+            <ul class="nav navbar-nav align-items-center ms-auto">
+                <li class="nav-item d-none d-lg-block">
+                    <a class="nav-link nav-link-style">
+                        <i class="ficon" data-feather="moon"></i>
+                    </a>
+                </li>
+                <li class="nav-item dropdown dropdown-user">
+                    <a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="user-nav d-sm-flex d-none">
+                            <span class="user-name fw-bolder">{{auth()->user()->fullName()}}</span>
+                        </div>
+                        <span class="avatar">
+                            <img class="round" src="{{asset('app-assets//images/portrait/small/avatar-s-11.jpg')}}" alt="avatar" height="40" width="40">
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user">
+                        <a class="dropdown-item" href="#">
+                            <i class="me-50" data-feather="user"></i> Profile
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ route('user.logout')}}">
+                            <i class="me-50" data-feather="power"></i>  Logout
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- END: Header-->

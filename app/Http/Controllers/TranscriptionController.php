@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use getID3;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Transcription;
 use PhpOffice\PhpWord\PhpWord;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Date;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
@@ -24,6 +26,7 @@ class TranscriptionController extends Controller
             
             if ($request->hasFile('audio')) {
                 $originalName = pathinfo($request->audio->getClientOriginalName(), PATHINFO_FILENAME);
+                $cleanedName = str_replace('_', ' ', $originalName); //For saving in table to show the user
                 $audioName = Str::slug($originalName, '_') . '_' . date('Ymdhis') . '.' . $request->audio->getClientOriginalExtension();
                 // Move the file to public folder
                 $request->file('audio')->move($folderPath, $audioName);
@@ -69,8 +72,9 @@ class TranscriptionController extends Controller
                 $transcription->language                    = $request->language;
                 $transcription->speakers                    = $request->speakers;
                 $transcription->audio_file_name             = $audioName;
-                $transcription->audio_file_original_name    = $originalName;
                 $transcription->audio_file_duration         = $duration;
+                $transcription->transcribe_to_english       = $request->transcribe_to_english;
+                $transcription->audio_file_original_name    = $cleanedName;
                 $transcription->transcribe_with_package     = auth()->user()->currentSubscription->id;
                 $transcription->save(); 
         
@@ -115,6 +119,13 @@ class TranscriptionController extends Controller
                 $min_speakers = (int)$transcript->speakers;
                 $max_speakers = (int)$transcript->speakers + 1;
                 $authorizationToken = "Bearer ".env('WISHPER_API_KEY');
+
+                // Check if the user wants to transcribe to English
+                if($transcript->transcribe_to_english == 1){
+                    $transcribe_to_english = true; 
+                }else{
+                    $transcribe_to_english = false;
+                }
     
                 // API request to lemonfox for speech-to-text transcription
                 $response = Http::withHeaders([
@@ -123,6 +134,7 @@ class TranscriptionController extends Controller
                     'file'           => $fileUrl, // Send the audio file URL
                     'language'       => $transcript->language,
                     'speaker_labels' => true,
+                    'translate'      => $transcribe_to_english,
                     'min_speakers'   => $min_speakers, 
                     'max_speakers'   => $max_speakers, 
                     'response_format'=> 'verbose_json',
@@ -182,6 +194,7 @@ class TranscriptionController extends Controller
     }
 
     public function viewTranscription(Transcription $transcription){
+        // return $transcription->transcription_segments;
         if($transcription->user_id != auth()->user()->id){
             alert()->error('error', 'You do not have access for this transcriptions');
             return redirect()->route('user.dashboard');
@@ -207,6 +220,26 @@ class TranscriptionController extends Controller
         $transcription->transcription_from_api = $request->transcription_from_api;
         $transcription->save();
         alert()->success('Success', 'Transcription updated successfully');
+        return redirect()->route('user.dashboard');
+    }
+
+    public function updateTranscriptionSegment(Request $request, $id) {
+        $transcription = Transcription::findOrFail($id);
+        // Decode existing segments
+        $segments = json_decode($transcription->transcription_segments, true); // decode as associative array
+
+        // Find and update the segment
+        foreach ($segments as &$segment) {
+            if ($segment['id'] == $request->segment_id) {
+                $segment['text'] = $request->text;
+                $segment['speaker'] = $request->speaker;
+                break;
+            }
+        }
+        // Save the updated segments back
+        $transcription->transcription_segments = json_encode($segments, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $transcription->save();
+        alert()->success('Success', 'Transcription Segment updated successfully');
         return redirect()->route('user.dashboard');
     }
 
@@ -296,4 +329,36 @@ class TranscriptionController extends Controller
         return response()->download($filePath);
     }
     
+    public function appToProofReading($id)
+    {
+        try {
+            $transcription = Transcription::where('id', $id)->update([
+                'add_to_proofreading' => 1
+            ]);
+
+            $addToTasks                 = new Task();
+            $addToTasks->audio_id       = $id;
+            $addToTasks->uploaded_dt    = Date::now();
+            $addToTasks->level          = 1;
+            $addToTasks->save();
+            alert()->success('success', 'Your transcription has beed added to proof reading.');
+            return redirect()->back();
+        } catch (\Exception $ex) {
+            alert()->success('error', $ex->getMessage());
+            return redirect()->back();
+        }
+    }
+
+    public function renameFile(Request $request){
+        try {
+            $transcription = Transcription::where('id', $request->transcription_id)->update([
+                'audio_file_original_name' => $request->name
+            ]);
+            alert()->success('success', 'File Renamed Successfully');
+            return redirect()->back();
+        } catch (\Exception $ex) {
+            alert()->success('error', $ex->getMessage());
+            return redirect()->back();
+        }
+    }
 }

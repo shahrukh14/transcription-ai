@@ -17,6 +17,13 @@
                     <span class="menu-title text-truncate font-size-12px" data-i18n="Dashboards">@lang('Dashboards')</span>
                 </a>
             </li>
+
+            <li class="@if ((request()->is('proof-reader/tasks*'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('proof-reader.tasks.list') }}">
+                    <i data-feather="home"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="Dashboards">@lang('Tasks')</span>
+                </a>
+            </li>
         </ul>
     </div>
   </div>
