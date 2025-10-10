@@ -29,7 +29,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <label class="mb-2"><strong>Audio File:</strong></label>
-                                        <p class="mb-2">{{ $detail->audio_file_name }}<a href="{{ asset('user/audios/' . $detail->audio_file_name) }}" class="btn btn-sm btn-primary ms-2" download>
+                                        <p class="mb-2">{{ $detail->audio_file_original_name }}<a href="{{ asset('user/audios/' . $detail->audio_file_name) }}" class="btn btn-sm btn-primary ms-2" download>
                                             <i class="fa fa-download"></i> Download
                                         </a></p>
                                     

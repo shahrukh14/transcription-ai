@@ -73,7 +73,7 @@
                                                         <td class="text-nowrap">{{ $index + 1 }}</td>
                                                         <td>{{ !empty($transcription->created_at) ? \Carbon\Carbon::parse($transcription->created_at)->format('d-m-Y') : 'N/A' }}</td>
                                                         <td class="text-nowrap">{{ optional($transcription->getUserName)->first_name }} {{ optional($transcription->getUserName)->last_name }}</td>
-                                                        <td class="text-nowrap">{{ $transcription->audio_file_name }}</td>
+                                                        <td class="text-nowrap">{{ $transcription->audio_file_original_name }}</td>
                                                         <td class="text-nowrap">{{ \Illuminate\Support\Str::words($transcription->transcription_from_api, 6, '...') }}</td>
                                                         <td class="text-nowrap">{{ gmdate('i:s', $transcription->audio_file_duration) }}</td>
                                                         <td class="text-nowrap">{{ optional($transcription->getPackage)->name }} </td>

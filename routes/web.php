@@ -214,6 +214,7 @@ Route::prefix('user')->name('user.')->group(function () {
         Route::prefix('transcription')->name('transcription.')->group(function () {
             Route::get('render-table', [TranscriptionController::class, 'renderTranscriptionTable'])->name('render.table');
             Route::get('get', [TranscriptionController::class, 'getTranscription'])->name('get');
+            Route::get('view/{transcription}', [TranscriptionController::class, 'viewTranscription'])->name('view');
             Route::get('edit/{transcription}', [TranscriptionController::class, 'editTranscription'])->name('edit');
             Route::post('update/{id}', [TranscriptionController::class, 'updateTranscription'])->name('update');
             Route::get('pdf/download/{transcription}', [TranscriptionController::class, 'transcriptionPDFdownload'])->name('pdf.download');
@@ -234,3 +235,5 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
         Route::get('logout', [ReaderController::class, 'logout'])->name('logout');
     });
 });
+
+Route::get('audio/download/{filename}', [TranscriptionController::class, 'audioDownload'])->name('audio.download');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use getID3;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Transcription;
 use PhpOffice\PhpWord\PhpWord;
@@ -23,7 +24,7 @@ class TranscriptionController extends Controller
             
             if ($request->hasFile('audio')) {
                 $originalName = pathinfo($request->audio->getClientOriginalName(), PATHINFO_FILENAME);
-                $audioName = $originalName . '_' . date('Ymdhis') . '.' . $request->audio->getClientOriginalExtension();
+                $audioName = Str::slug($originalName, '_') . '_' . date('Ymdhis') . '.' . $request->audio->getClientOriginalExtension();
                 // Move the file to public folder
                 $request->file('audio')->move($folderPath, $audioName);
 
@@ -63,14 +64,15 @@ class TranscriptionController extends Controller
                 }
                 
                 // Store in database
-                $transcription                           = new Transcription();
-                $transcription->user_id                  = auth()->user()->id;
-                $transcription->language                 = $request->language;
-                $transcription->speakers                 = $request->speakers;
-                $transcription->audio_file_name          = $audioName;
-                $transcription->audio_file_duration      = $duration;
-                $transcription->transcribe_with_package  = auth()->user()->currentSubscription->id;
-                $transcription->save();
+                $transcription                              = new Transcription();
+                $transcription->user_id                     = auth()->user()->id;
+                $transcription->language                    = $request->language;
+                $transcription->speakers                    = $request->speakers;
+                $transcription->audio_file_name             = $audioName;
+                $transcription->audio_file_original_name    = $originalName;
+                $transcription->audio_file_duration         = $duration;
+                $transcription->transcribe_with_package     = auth()->user()->currentSubscription->id;
+                $transcription->save(); 
         
                 return response()->json([
                     'success' => true,
@@ -109,43 +111,29 @@ class TranscriptionController extends Controller
             $transcriptions = Transcription::where('user_id', auth()->user()->id)->where('status', 0)->get();
             foreach ($transcriptions as $transcript) {
                 // Generate public URL for the audio file
-                $fileUrl = asset('user/audios/' . $transcript->audio_file_name);
+                $fileUrl = route('audio.download', ['filename' => $transcript->audio_file_name]);
                 $min_speakers = (int)$transcript->speakers;
                 $max_speakers = (int)$transcript->speakers + 1;
                 $authorizationToken = "Bearer ".env('WISHPER_API_KEY');
     
                 // API request to lemonfox for speech-to-text transcription
-                // $response = Http::withHeaders([
-                //     'Authorization' => $authorizationToken,
-                // ])->timeout(300)->post('https://api.lemonfox.ai/v1/audio/transcriptions', [
-                //     'file'           => $fileUrl, // Send the audio file URL
-                //     'language'       => $transcript->language, // Dynamic language from DB
-                //     'speaker_labels' => true, // Dynamic speakers from DB
-                //     'min_speakers'   => $min_speakers, 
-                //     'max_speakers'   => $max_speakers, 
-                //     'response_format'=> 'verbose_json',
-                // ]);
-
-                $audioPath = public_path('user/audios/' . $transcript->audio_file_name); // Update if path is different
                 $response = Http::withHeaders([
-                    'Authorization' => "Bearer " . env('WISHPER_API_KEY'),
-                ])->timeout(300)->attach(
-                    'file', file_get_contents($audioPath), $transcript->audio_file_name
-                )->post('https://api.lemonfox.ai/v1/audio/transcriptions', [
+                    'Authorization' => $authorizationToken,
+                ])->timeout(300)->post('https://api.lemonfox.ai/v1/audio/transcriptions', [
+                    'file'           => $fileUrl, // Send the audio file URL
                     'language'       => $transcript->language,
                     'speaker_labels' => true,
-                    'min_speakers'   => (int)$transcript->speakers,
-                    'max_speakers'   => (int)$transcript->speakers + 1,
+                    'min_speakers'   => $min_speakers, 
+                    'max_speakers'   => $max_speakers, 
                     'response_format'=> 'verbose_json',
                 ]);
 
-    
                 $data = $response->json();
                 //Update transcript in table
                 $transcript->transcription_from_api  = $data['text'];
+                $transcript->transcription_segments  = json_encode($data['segments']);
                 $transcript->status = 1;
                 $transcript->save();
-    
             }
     
             return response()->json([
@@ -192,12 +180,18 @@ class TranscriptionController extends Controller
             ]);
         }
     }
-    
-    
+
+    public function viewTranscription(Transcription $transcription){
+        if($transcription->user_id != auth()->user()->id){
+            alert()->error('error', 'You do not have access for this transcriptions');
+            return redirect()->route('user.dashboard');
+        }
+        return view('user.transcription_view', compact('transcription'));
+    }
 
     public function editTranscription(Transcription $transcription){
         if($transcription->user_id != auth()->user()->id){
-            alert()->error('error', 'You can not edit this Transcriptions');
+            alert()->error('error', 'You do not have access for this transcriptions');
             return redirect()->route('user.dashboard');
         }
         return view('user.transcription_edit', compact('transcription'));
@@ -228,32 +222,78 @@ class TranscriptionController extends Controller
         return redirect()->route('user.dashboard');
     }
 
-    public function transcriptionPDFdownload(Transcription $transcription){
-        $pdf = Pdf::loadView('user.transcription_pdf', compact('transcription'));
-        return $pdf->download("transcription.pdf");
+    public function transcriptionPDFdownload(Request $request, Transcription $transcription){
+        $pdf = Pdf::loadView('user.transcription_pdf', compact('transcription','request'));
+        $fileName = $transcription->audio_file_original_name.".pdf";
+        return $pdf->download($fileName);
     }
 
-    public function transcriptionDOCXdownload(Transcription $transcription){
+    public function transcriptionDOCXdownload(Request $request, Transcription $transcription){
         $phpWord = new PhpWord();
-
-        // Add a section
         $section = $phpWord->addSection();
 
-        // Add audio file name to the section
-        $section->addText("File Name : ".$transcription->audio_file_name, ['bold' => true]);
+        // Add audio file name
+        $section->addText("File Name: " . $transcription->audio_file_original_name, [
+            'bold' => true,
+            'size' => 14
+        ]);
 
-        // Add more content
-        $section->addText($transcription->transcription_from_api);
+        // Prepare speaker map and counter
+        $speakerMap = [];
+        $speakerCounter = 1;
 
-        // Save to a file in public path
-        $fileName = $transcription->audio_file_name.'.docx';
+        $segments = json_decode($transcription->transcription_segments);
+
+        if (!empty($segments)) {
+            foreach ($segments as $segment) {
+                $line = '';
+
+                // Speaker mapping
+                if (!isset($speakerMap[$segment->speaker])) {
+                    $speakerMap[$segment->speaker] = 'Speaker ' . $speakerCounter++;
+                }
+
+                // Format timestamp
+                $timeInSeconds = $segment->start;
+                $minutes = floor($timeInSeconds / 60);
+                $seconds = round($timeInSeconds % 60);
+                $formattedTime = sprintf("%02d:%02d", $minutes, $seconds);
+
+                // Build speaker + timestamp line if applicable
+                if ($request->speaker == "true") {
+                    $line .= $speakerMap[$segment->speaker];
+                }
+
+                if ($request->timestamp == "true") {
+                    $line .= ($line ? ' ' : '') . "($formattedTime)";
+                }
+
+                // Add the speaker+timestamp line if it's not empty
+                if (!empty($line)) {
+                    $section->addText($line, ['bold' => true, 'color' => '333333']);
+                }
+
+                // Always add the actual spoken text
+                $section->addText($segment->text, ['size' => 12]);
+            }
+        } else {
+            $section->addText("No transcription segments found.");
+        }
+
+        // Save and download
+        $fileName = $transcription->audio_file_original_name . '.docx';
         $path = public_path($fileName);
 
         $writer = IOFactory::createWriter($phpWord, 'Word2007');
         $writer->save($path);
 
-        // Download the file
         return response()->download($path)->deleteFileAfterSend(true);
+    }
+
+
+    public function audioDownload($filename){
+        $filePath = public_path('user/audios/' . $filename);
+        return response()->download($filePath);
     }
     
 }

@@ -38,7 +38,7 @@
                             <div class="card-header d-flex justify-content-between">
                                 <h6 class="card-title">
                                     <i class="fa-regular fa-file-audio" style="font-size:25px;"></i>
-                                    {{$transcription->audio_file_name}}
+                                    {{$transcription->audio_file_original_name}}
                                 </h6>
                                 <h6 class="card-title">
                                     @if($transcription->status == 0)

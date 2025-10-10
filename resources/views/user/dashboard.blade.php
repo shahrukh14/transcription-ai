@@ -117,19 +117,18 @@
                 </div>
                 <div class="otherElements">
                     <div class="mb-4">
-                        <label for="languageSelect" class="form-label">Audio Language</label>
-                        <select class="form-select mb-2" id="languageSelect">
-                            <option disabled selected>Select Language</option>
+                        <label for="languageSelect" class="form-label fw-semibold mb-2">Select Audio Language</label>
+                        <select class="form-control mb-1 select2" id="languageSelect">
+                            <option value="">Select</option>
                             @foreach ($languages as $language)
                                 <option value="{{$language}}">{{Illuminate\Support\Str::ucfirst($language)}}</option>
                             @endforeach
                         </select>
                     </div>
-
                     <div class="mb-4">
-                        <label for="speakers" class="form-label">How many speakers?</label>
-                        <select class="form-select mb-2" id="speakers">
-                            <option disabled selected>Select number of speakers</option>
+                        <label for="speakers" class="form-label fw-semibold mb-2">How many speakers?</label>
+                        <select class="form-control" id="speakers" aria-label="Speaker count selection">
+                            <option selected disabled>Select number of speakers</option>
                             <option value="2">2 speakers</option>
                             <option value="3">3 speakers</option>
                             <option value="4">4 speakers</option>
@@ -242,6 +241,14 @@
     .otherElements{
         margin-top: 10px;
     }
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: .775rem 1.75rem;
+        font-size: 1.5rem;
+        font-weight: 400;
+        line-height: 1.8;
+    }
 </style>
 
 @endpush
@@ -251,6 +258,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
 <script> 
 $(document).ready(function () {
+
     // Get Transcription function call on page load
     renderTranscriptionTable();
 

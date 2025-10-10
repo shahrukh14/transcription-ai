@@ -1,15 +1,8 @@
-@push('style')
-<style>
-
-</style>
-    
-@endpush
-
 <footer class="rts-footer site-footer-four" style="padding: 50px">
     <div class="container position-relative z-1">
         <div class="row">
             <!-- widget -->
-        @php  
+            @php
             $existingSettings = App\Models\Generalsettings::first();
             $dynamicpages = App\Models\Dynamic::first();
         @endphp
@@ -117,21 +110,50 @@
 
 <!-- All Plugin -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 <!-- All Plugin -->
-<script defer src="{{ asset('user-assets/js/plugins.min.js') }}"></script>
+<script src="{{ asset('user-assets/js/plugins.min.js') }}"></script>
 <!-- main js -->
-<script defer src="{{ asset('user-assets/js/main.js') }}"></script>
+<script src="{{ asset('user-assets/js/main.js') }}"></script>
 <!-- sweetalert js -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
 <!-- bootstrap js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+    // Destroy any existing instances first
+    if ($('#languageSelect').hasClass('select2-hidden-accessible')) {
+        $('#languageSelect').select2('destroy');
+    }
+    if ($('#languageSelect').next('.nice-select').length) {
+        $('#languageSelect').next('.nice-select').remove();
+    }
 
+    // Initialize Select2 when modal is shown
+    $('#dropZoneModal').on('shown.bs.modal', function() {
+        $('#languageSelect').select2({
+            dropdownParent: $('#dropZoneModal'),
+            width: '100%',
+            placeholder: "Select language",
+        });
+    });
+
+    // Clean up when modal is hidden
+    $('#dropZoneModal').on('hidden.bs.modal', function() {
+        if ($('#languageSelect').hasClass('select2-hidden-accessible')) {
+            $('#languageSelect').select2('destroy');
+        }
+    });
+}); 
+</script>
 @include('sweetalert::alert')
-
-@stack('modal')
 @stack('script')
+@stack('modal')
 
 </body>
+
 </html>
