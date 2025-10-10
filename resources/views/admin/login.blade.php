@@ -60,7 +60,7 @@
                     <div class="auth-inner row m-0">
                         <!-- Brand logo--><a class="brand-logo" href="/">
                         @if($existingSettings && $existingSettings->logo != null)
-                         <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" class="d-none d-lg-block d-xl-block" style="height:90px" alt="">
+                         <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" class="d-none d-lg-block d-xl-block" style="height:58px" alt="">
                         @endif
                         </a>
                         <!-- /Brand logo-->
@@ -78,7 +78,7 @@
                                 @endif
                                 <div class="d-flex justify-content-center align-items-center mb-3">
                                 @if($existingSettings && $existingSettings->logo != null)
-                                    <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" class="m-auto" style="height:120px" alt="">
+                                    <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" class="m-auto" style="height:41px" alt="">
                                 @endif
                                 </div>
                                 <h2 class="card-text mb-2">ADMIN LOGIN</h2>

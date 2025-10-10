@@ -5,7 +5,7 @@
             <li class="nav-item me-auto h-100" style="margin: auto;">
                 @php  $existingSettings = App\Models\Generalsettings::first(); @endphp
                 @if($existingSettings && $existingSettings->logo != null)
-                    <a class="navbar-brand" style="height: 100% ; margin:0px;" href="{{route('admin.dashboard')}}"> <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" style="height: 50px "alt=""></span>
+                    <a class="navbar-brand mt-2" style="height: 100% ; margin:0px;" href="{{route('admin.dashboard')}}"> <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" style="height: 29px "alt=""></span>
                         <h2 class="brand-text"></h2>
                     </a>
                 @endif
@@ -50,6 +50,18 @@
                     <span class="menu-title text-truncate font-size-12px" data-i18n="Packages">@lang('Packages')</span>
                 </a>
             </li>
+            <li class="@if ((request()->is('admin/subscription')) || (request()->is('admin/subscription/list')) || (request()->is('admin/subscription/detail*'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('admin.subscription.list') }}">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="dollar-sign">@lang('subscription')</span>
+                </a>
+            </li>
+            <li class="@if ((request()->is('admin/transcription')) || (request()->is('admin/transcription/list'))|| (request()->is('admin/transcription/detail*'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('admin.transcription.list') }}">
+                    <i class="fa-solid fa-microphone"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="dollar-sign">@lang('Transcription')</span>
+                </a>
+            </li>
 
             <li class=" nav-item">
                 <a class="d-flex align-items-center" href="#">
@@ -89,6 +101,12 @@
                         <a class="d-flex align-items-center" href="{{ route('admin.gallery.list') }}">
                             <i data-feather="image"></i>
                             <span class="menu-title text-truncate font-size-12px" data-i18n="Gallery">@lang('Gallery')</span>
+                        </a>
+                    </li>
+                    <li class="@if ( (request()->is('admin/contact-list'))) active  @endif nav-item">
+                        <a class="d-flex align-items-center" href="{{ route('admin.contact.list') }}">
+                            <i data-feather="phone"></i>
+                            <span class="menu-title text-truncate font-size-12px" data-i18n="Gallery">@lang('Contact')</span>
                         </a>
                     </li>
 

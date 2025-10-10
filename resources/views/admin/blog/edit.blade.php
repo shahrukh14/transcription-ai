@@ -68,7 +68,7 @@
                             <div class="row mb-2">
                                 <div class="col-12">
                                     <label for="description" class="form-label">@lang('Description')</label>
-                                    <textarea class="form-control" placeholder="@lang('Enter Description')" name="description" id="description" rows="4"
+                                    <textarea class="form-control" placeholder="@lang('Enter Description')" name="description" id="description" class="description" rows="4"
                                         required>{{ old('description', $blogs->description) }}</textarea>
                                 </div>
                             </div>

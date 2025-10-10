@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html class="loading" lang="en" data-textdirection="ltr">
 <!-- BEGIN: Head-->
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
-    <meta name="description"
-        content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
-    <meta name="keywords"
-        content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
+    <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
+    <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
     <link rel="canonical" href="https://html.themewant.com/hostie">
     <meta name="robots" content="index, follow">
@@ -26,7 +22,7 @@
     <!-- favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('user-assets/images/fav.png') }}">
 
-    <title>Hostie - Web Hosting & WHMCS Template</title>
+    <title>@yield('title')</title>
     <!-- Preconnect to Google Fonts and Google Fonts Static -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,9 +33,21 @@
     <!-- all styles -->
     <link rel="preload stylesheet" href="{{ asset('user-assets/css/plugins.min.css') }}" as="style">
     <!-- fontawesome css -->
-    <link rel="preload stylesheet" href="{{ asset('user-assets/css/plugins/fontawesome.min.css') }}" as="style">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
     <!-- Custom css -->
     <link rel="preload stylesheet" href="{{ asset('user-assets/css/style.css') }}" as="style">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+
+    <style>
+        .swal2-popup.swal2-modal{
+            font-size: 14px;
+        }
+    </style>     
     @stack('style')
 </head>
 <!-- END: Head-->
@@ -53,17 +61,32 @@
                 <div class="row">
                     <div class="rts-header__wrapper">
                         <!-- FOR LOGO -->
-                        <div class="rts-header__logo">
+                        @php  
+                            $dynamicpages     = App\Models\Dynamic::first();
+                            $existingSettings = App\Models\Generalsettings::first();
+                        @endphp
+                        <div class="rts-header__logo mt-5">
                             <a href="{{ route('home') }}" class="site-logo">
-                                <img class="logo-white" src="{{ asset('user-assets/images/logo/logo-1.svg') }}" alt="Hostie">
-                                <img class="logo-dark" src="{{ asset('user-assets/images/logo/logo-4.svg') }}" alt="Hostie">
+                                @if($existingSettings && $existingSettings->logo != null)
+                                <a class="navbar-brand coustem-navbar-brand" style="height: 100% ; margin:0px;" href="{{route('admin.dashboard')}}"> <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" style="height: 29px "alt=""></span>
+                                    <h2 class="brand-text"></h2>
+                                </a>
+                            @endif
+                              
                             </a>
                         </div>
                         <!-- FOR NAVIGATION MENU -->
-
                         <nav class="rts-header__menu" id="mobile-menu">
                             <div class="hostie-menu">
                                 <ul class="list-unstyled hostie-desktop-menu">
+                                    <li class="menu-item">
+                                        <a href="{{ route('home') }}" class="hostie-dropdown-main-element">Home</a>
+                                    </li>
+                                    @if($dynamicpages != null)
+                                    <li class="menu-item">
+                                        <a href="{{ route('page', ['slug' => $dynamicpages->slug]) }}" class="hostie-dropdown-main-element">About Us</a>
+                                    </li>
+                                    @endif
                                     <li class="menu-item">
                                         <a href="{{ route('pricing') }}" class="hostie-dropdown-main-element">Pricing</a>
                                     </li>
@@ -73,13 +96,20 @@
                                     <li class="menu-item">
                                         <a href="{{ route('blog') }}" class="hostie-dropdown-main-element">Blog</a>
                                     </li>
+                                    <li class="menu-item">
+                                        <a href="{{ route('contact') }}" class="hostie-dropdown-main-element">Contact Us</a>
+                                    </li>
 
                                 </ul>
                             </div>
                         </nav>
                         <!-- FOR HEADER RIGHT -->
                         <div class="rts-header__right">
-                            <a href="{{ route('sign.in') }}" class="login__btn">Sign In</a>
+                            @auth
+                                <a href="{{ route('user.logout') }}" class="login__btn">Logout</a>
+                            @else
+                                <a href="{{ route('login') }}" class="login__btn">Sign In</a>
+                            @endauth
                             <button id="menu-btn" class="mobile__active menu-btn"><i class="fa-sharp fa-solid fa-bars"></i></button>
                         </div>
                     </div>

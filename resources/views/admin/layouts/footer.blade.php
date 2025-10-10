@@ -64,6 +64,12 @@
                 height: 14
             });
         }
+		ClassicEditor
+            .create(document.querySelector('#description'))
+            .catch(error => {
+                console.error(error);
+         });
+
     })
   </script>
 @stack('modal')
@@ -73,4 +79,5 @@
 </body>
 <!-- END: Body-->
 
-</html>
+</html>     
+

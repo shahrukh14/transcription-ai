@@ -5,6 +5,9 @@
         <nav class="nav-main mainmenu-nav mt--30">
             <ul class="mainmenu metismenu" id="mobile-menu-active">
                 <li class="">
+                    <a href="{{ route('home') }}" class="main">Home</a>
+                </li>
+                <li class="">
                     <a href="{{ route('pricing') }}" class="main">Pricing</a>
                 </li>
                 <li class="">
@@ -12,6 +15,9 @@
                 </li>
                 <li class="">
                     <a href="{{ route('blog') }}" class="main">Blog</a>
+                </li>
+                <li class="">
+                    <a href="{{ route('blog') }}" class="main">Contact Us</a>
                 </li>
             </ul>
         </nav>

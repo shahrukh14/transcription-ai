@@ -42,7 +42,7 @@
                         <div class="row mb-2">
                             <div class="col-12">
                                 <label for="description" class="form-label">@lang('Description')</label>
-                                <textarea class="form-control" name="description" id="description" required></textarea>
+                                <textarea class="form-control description" name="description" id="description"></textarea>
                                 @error('description')
                                 <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror
@@ -59,36 +59,3 @@
 <!-- END: Content-->
 @endsection
 
-@push('script')
-<script>
-    $(document).ready(function() {
-        $("#blogForm").validate({
-            rules: {
-                title: {
-                    required: true,
-
-                },
-
-                description: {
-                    required: true
-                }
-
-            },
-            messages: {
-                title: {
-                    required: "*Title is required",
-
-                },
-
-                description: {
-                    required: "*Description is required",
-                },
-
-            },
-
-        });
-
-
-    });
-</script>
-@endpush

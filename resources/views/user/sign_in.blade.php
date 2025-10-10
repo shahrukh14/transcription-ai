@@ -1,5 +1,5 @@
 @extends('user.layouts.layout')
-@section('title', 'Blog Details')
+@section('title', 'Sign In')
 @section('content')
 
 <div class="rts-sign-up-section">
@@ -7,14 +7,15 @@
         <div class="logo-area">
             <a href="index.php"><img src="{{ asset('user-assets/images/logo/logo-4.svg') }}" alt=""></a>
         </div>
-        <form action="#">
+        <form action="{{ route('user.login-details-submit') }}" method="POST">
+            @csrf
             <h2 class="form-title">Sign In</h2>
             <div class="form-inner">
                 <div class="single-wrapper">
-                    <input type="email" placeholder="Your email" required>
+                    <input type="email"  name="email" placeholder="Your email" required>
                 </div>
                 <div class="single-wrapper">
-                    <input type="password" placeholder="Password" required>
+                    <input type="password" name="password" placeholder="Password" required>
                 </div>
                 <div class="check">
                     <div class="check-box-area">

@@ -50,4 +50,21 @@ class User extends Authenticatable
     public function fullName(){
         return $this->first_name." ".$this->last_name;
     }
+
+    public function currentSubscription(){
+        return $this->belongsTo(Package::class, "package_id");
+    }
+
+    public function transcriptions(){
+        return $this->hasMany(Transcription::class, "user_id");
+    }
+
+    public function audioDurationWithCurrentPackage(){
+        return $this->hasMany(Transcription::class, "user_id")->where('transcribe_with_package', $this->currentSubscription->id)->sum('audio_file_duration');
+    }
+
+    public function audioTrascriptionWithCurrentPackage(){
+        return $this->hasMany(Transcription::class, "user_id")->where('transcribe_with_package', $this->currentSubscription->id)->count();
+    }
+   
 }

@@ -2,27 +2,29 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\ReaderController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DynamicController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\WebsiteController;
-use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\PackagesController;
+use App\Http\Controllers\TranscribeController;
 use App\Http\Controllers\ProofReaderController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\SubscriptionsController;
+use App\Http\Controllers\TranscriptionController;
 use App\Http\Controllers\Auth\UserLogincontroller;
-use App\Http\Controllers\GeneralsettingsController;
 use App\Http\Controllers\Auth\AdminLoginController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\GeneralsettingsController;
 use App\Http\Controllers\RoleAndPermissionController;
-
-
 
 
 
@@ -128,6 +130,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('assign-permissions-to-role/{role_name}', [RoleAndPermissionController::class, 'assignPermissionForm'])->name('assign-permissions-to-role');
         Route::post('assign-permissions', [RoleAndPermissionController::class, 'assignPermissions'])->name('assign-permissions');
 
+        //contact    
+        Route::get('contact-list', [ContactController::class, 'contactlist'])->name('contact.list');
+        Route::get('contact-list/{id}', [ContactController::class, 'contactlistdelete'])->name('contact.list.delete');
+        Route::get('contact-export', [ContactController::class, 'contactexport'])->name('contact.export');
+
+        //Subscriptions
+        Route::prefix('subscription')->name('subscription.')->group(function () {
+            Route::get('/', [SubscriptionsController::class, 'list'])->name('list');
+            Route::get('detail/{id}', [SubscriptionsController::class, 'details'])->name('detail');
+        });
+
+        //transcriptions
+        Route::prefix('transcription')->name('transcription.')->group(function () {
+            Route::get('/', [TranscribeController::class, 'list'])->name('list');
+            Route::get('detail/{id}', [TranscribeController::class, 'details'])->name('detail');
+        });
+
+
         //Customers
         Route::prefix('customers')->name('customers.')->group(function () {
             Route::get('/', [CustomerController::class, 'list'])->name('list');
@@ -169,21 +189,41 @@ Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::get('pricing', [HomeController::class, 'pricing'])->name('pricing');
 Route::get('faqs', [HomeController::class, 'faqs'])->name('faqs');
 Route::get('blog', [HomeController::class, 'blog'])->name('blog');
-Route::get('blog-details', [HomeController::class, 'blogDetails'])->name('blog.details');
+Route::get('contact', [HomeController::class, 'contact'])->name('contact');
+Route::post('contact-store', [HomeController::class, 'contactstore'])->name('contact.store');
+Route::get('blog-details/{id}', [HomeController::class, 'blogDetails'])->name('blog.details');
+Route::get('testimonial', [HomeController::class, 'testimonial'])->name('testimonial');
+Route::get('terms-and-condition', [HomeController::class, 'termsAndCondition'])->name('terms.condition');
+Route::get('privecy-policy', [HomeController::class, 'policy'])->name('privecy-policy');
+Route::get('page/{slug}', [HomeController::class, 'page'])->name('page');
 
-Route::get('sign-in', [UserLogincontroller::class, 'signIn'])->name('sign.in');
+Route::get('sign-in', [UserLogincontroller::class, 'signIn'])->name('login');
 Route::get('sign-up', [UserLogincontroller::class, 'signUp'])->name('sign.up');
-
 
 Route::prefix('user')->name('user.')->group(function () {
     Route::post('login-details-submit', [UserLogincontroller::class, 'loginDetailsSubmit'])->name('login-details-submit');
+    Route::post('register', [UserLogincontroller::class, 'register'])->name('register');
 
     Route::middleware(['auth:web'])->group(function () {
         //Protected Route start
         Route::get('dashboard', [UserController::class, 'dashboard'])->name('dashboard');
         Route::get('logout', [UserController::class, 'logout'])->name('logout');
+
+
+        Route::post('audio/upload', [TranscriptionController::class, 'audioUpload'])->name('audio.upload');
+        Route::prefix('transcription')->name('transcription.')->group(function () {
+            Route::get('render-table', [TranscriptionController::class, 'renderTranscriptionTable'])->name('render.table');
+            Route::get('get', [TranscriptionController::class, 'getTranscription'])->name('get');
+            Route::get('edit/{transcription}', [TranscriptionController::class, 'editTranscription'])->name('edit');
+            Route::post('update/{id}', [TranscriptionController::class, 'updateTranscription'])->name('update');
+            Route::get('pdf/download/{transcription}', [TranscriptionController::class, 'transcriptionPDFdownload'])->name('pdf.download');
+            Route::get('docx/download/{transcription}', [TranscriptionController::class, 'transcriptionDOCXdownload'])->name('docx.download');
+            Route::get('delete/{transcription}', [TranscriptionController::class, 'deleteTranscription'])->name('delete');
+        });
     });
 });
+
+Route::post('/transcription/callback', [TranscriptionController::class, 'transcriptionCallback'])->name('transcription.callback');
 
 Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
     Route::get('login', [ReaderController::class, 'login'])->name('login');

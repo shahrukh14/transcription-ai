@@ -70,7 +70,7 @@
                             <div class="row mb-2">
                                 <div class="col-12">
                                     <label for="description" class="form-label">@lang('Description')</label>
-                                    <textarea class="form-control" name="description" id="description">{{ old('description') }}</textarea>
+                                    <textarea class="form-control" name="description" id="description" class="description">{{ old('description') }}</textarea>
                                     @error('description')
                                         <div class="alert alert-danger">{{ $message }}</div>
                                     @enderror
