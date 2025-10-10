@@ -17,5 +17,13 @@ class UserLogincontroller extends Controller
         return redirect()->back();
     }
   }
+    public function signIn()
+    {
+        return view('user.sign_in');
+    }
+    public function signUp()
+    {
+        return view('user.sign_up');
+    }
 
 }

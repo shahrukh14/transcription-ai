@@ -19,6 +19,7 @@ use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\Auth\UserLogincontroller;
 use App\Http\Controllers\GeneralsettingsController;
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleAndPermissionController;
 
 
@@ -164,9 +165,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 
-Route::get('/', function () {
-    return view('user.login');
-})->name('login');
+Route::get('/', [HomeController::class, 'home'])->name('home');
+Route::get('pricing', [HomeController::class, 'pricing'])->name('pricing');
+Route::get('faqs', [HomeController::class, 'faqs'])->name('faqs');
+Route::get('blog', [HomeController::class, 'blog'])->name('blog');
+Route::get('blog-details', [HomeController::class, 'blogDetails'])->name('blog.details');
+
+Route::get('sign-in', [UserLogincontroller::class, 'signIn'])->name('sign.in');
+Route::get('sign-up', [UserLogincontroller::class, 'signUp'])->name('sign.up');
+
+
 Route::prefix('user')->name('user.')->group(function () {
     Route::post('login-details-submit', [UserLogincontroller::class, 'loginDetailsSubmit'])->name('login-details-submit');
 
