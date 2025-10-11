@@ -344,7 +344,7 @@ class TranscriptionController extends Controller
             alert()->success('success', 'Your transcription has beed added to proof reading.');
             return redirect()->back();
         } catch (\Exception $ex) {
-            alert()->success('error', $ex->getMessage());
+            alert()->error('error', $ex->getMessage());
             return redirect()->back();
         }
     }

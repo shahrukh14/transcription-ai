@@ -64,6 +64,12 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="dropdown nav-item" data-menu="dropdown">
+                        <a class="nav-link d-flex align-items-center" href="{{route('user.transaction')}}">
+                            <i data-feather="home"></i>
+                            <span data-i18n="Dashboards">Transaction</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

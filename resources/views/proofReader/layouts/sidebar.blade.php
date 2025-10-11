@@ -18,10 +18,16 @@
                 </a>
             </li>
 
-            <li class="@if ((request()->is('proof-reader/tasks*'))) active @endif nav-item">
+            <li class="@if ((request()->is('proof-reader/tasks')) || (request()->is('proof-reader/tasks/view/*'))) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('proof-reader.tasks.list') }}">
-                    <i data-feather="home"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Dashboards">@lang('Tasks')</span>
+                    <i class="fa-solid fa-list"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="All Tasks">@lang('All Tasks')</span>
+                </a>
+            </li>
+            <li class="@if ((request()->is('proof-reader/tasks/my-task'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('proof-reader.tasks.my.task') }}">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="All Tasks">@lang('My Tasks')</span>
                 </a>
             </li>
         </ul>

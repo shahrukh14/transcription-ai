@@ -23,7 +23,7 @@
                                 </h4>
                                 <h6 class="card-title">
                                     @if($task->transcription->status == 0)
-                                        <span class="rounded-pill badge-light-warning me-1">Untranscribed</span>
+                                        <span class="badge rounded-pill badge-light-warning me-1">Untranscribed</span>
                                     @else
                                         <span class="badge rounded-pill badge-light-success me-1">Transcribed</span>
                                     @endif
@@ -34,15 +34,10 @@
                                     <p class="fw-bolder">{{date('d M Y, h:i A', strtotime($task->transcription->created_at))}}</p>
                                     <div class="form-floating col-md-12">
                                         @php 
-                                            $speakerMap = []; 
-                                            $speakerCounter = 1;
                                             $transcription_segments = $task->transcription_segments == null ? $task->transcription->transcription_segments : $task->transcription_segments;
                                         @endphp
                                         @foreach (json_decode($transcription_segments)??[] as $segment)
                                             @php
-                                                if (!isset($speakerMap[$segment->speaker])) {
-                                                    $speakerMap[$segment->speaker] = 'Speaker ' . $speakerCounter++;
-                                                }
                                                 $timeInSeconds  = $segment->start;
                                                 $minutes        = floor($timeInSeconds / 60);
                                                 $seconds        = $timeInSeconds - ($minutes * 60);
@@ -50,11 +45,24 @@
                                                 $formattedTime  = sprintf("%02d:%02d", $minutes, $roundedSeconds);
                                             @endphp
                                             <div class="pt-1">
-                                                <span class="fw-bolder speaker">{{ $speakerMap[$segment->speaker] }}</span>
-                                                <span class="playAudio" data-start="{{ $segment->start }}"><i class="fa-solid fa-music"></i></span>
+                                                <div class="dropdown">
+                                                    <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0 fw-bolder speakerNameText" data-bs-toggle="dropdown">
+                                                        {{ $allSpeakers[$segment->speaker] }}
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                        @foreach ($allSpeakers as $speakrValue => $speakerName)
+                                                        <a class="dropdown-item speakerDropdown" href="#" title="View Transcription" data-speaker="{{$speakrValue}}" data-id="{{ $segment->id }}" >
+                                                            <span>{{$speakerName}}</span>
+                                                        </a>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                {{-- <span class="fw-bolder speaker">{{ $allSpeakers[$segment->speaker] }}</span>
+                                                <span class="playAudio" data-start="{{ $segment->start }}"> <i class="fa-solid fa-volume-high"></i></span> --}}
                                                 <p class="@if($task->status != 'Complete') segment @endif segment-style" data-start="{{ $segment->start }}" data-id="{{ $segment->id }}" data-speaker="{{ $segment->speaker }}">
                                                     <span style="color: #717272" class="time-stamp">({{ $formattedTime }})</span>
-                                                    <span class="editable" contenteditable="false">{{ $segment->text }}</span>
+                                                    <span class="editable-text">{{ $segment->text }}</span>
+                                                    <input type="text" class="form-control edit-input d-none" value="{{ $segment->text }}">
                                                 </p>
                                             </div>
                                         @endforeach
@@ -140,7 +148,7 @@
                             <label for="speaker_select" class="form-label"><i class="fa-solid fa-user"></i> Speaker</label>
                             <select class="form-select select2" id="speaker_select" name="speaker" aria-label="Speaker count selection" >
                                 <option selected disabled>Speaker</option>
-                                @foreach ($speakerMap as $key => $name)
+                                @foreach ($allSpeakers as $key => $name)
                                     <option value="{{$key}}">{{$name}}</option>
                                 @endforeach
                             </select>
@@ -170,11 +178,6 @@
         margin-top: 6px;
         padding: 3px 1px 3px 1px; 
     }
-    .segment .editable[contenteditable="true"] {
-        border: 1px solid #007bff !important;
-        padding: 2px;
-        border-radius: 4px;
-    }
     .playAudio{
         cursor: pointer;
     }
@@ -185,7 +188,7 @@
 @push('script')
 <script> 
 $(document).ready(function () {
-
+    let originalText = '';
     //select2 initialization
     $('.select2').select2({
         placeholder: "Select",
@@ -233,24 +236,27 @@ $(document).ready(function () {
         updateDownloadUrl();
     });
 
-
-    // Make the span editable on click
-    $(document).on('click', '.segment .editable', function (e) {
-        e.stopPropagation(); // Avoid triggering document click
-        $('.editable').not(this).attr('contenteditable', 'false'); // Close others
-        $(this).attr('contenteditable', 'true').focus();
-        originalText = $(this).text().trim();
+    // On span click → hide span, show input
+    $(document).on('click', '.segment .editable-text', function () {
+        let $span = $(this);
+        let $p = $span.closest('.segment');
+        let $input = $p.find('.edit-input');
+        originalText = $span.text().trim();
+        $span.addClass('d-none');
+        $input.val(originalText).removeClass('d-none').focus();
     });
 
-    // Detect blur (click outside or focus out)
-    $(document).on('blur', '.editable', function () {
-        let $span = $(this);
-        let newText = $span.text().trim();
-        if (newText !== originalText) {
-            let $p = $span.closest('.segment');
-            let segmentId = $p.data('id');
-            let speaker = $p.data('speaker');
+    // On blur of input → AJAX save
+    $(document).on('blur', '.edit-input', function () {
+        let $input = $(this);
+        let newText = $input.val().trim();
+        let $p = $input.closest('.segment');
+        let $span = $p.find('.editable-text');
+        let segmentId = $p.data('id');
+        let speaker = $p.data('speaker');
 
+        // Only send AJAX if text was changed
+        if (newText !== originalText) {
             $.ajax({
                 url: "{{ route('proof-reader.tasks.update', $task->id) }}",
                 method: "POST",
@@ -262,25 +268,49 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     toastr.success(response.message);
+                    $span.text(newText);
                 },
-                error: function (xhr) {
-                    toastr.error('SOmething went wrong');
-                    $span.text(originalText); // revert
+                error: function () {
+                    toastr.error('Something went wrong');
+                    $input.val(originalText);
+                },
+                complete: function () {
+                    $input.addClass('d-none');
+                    $span.removeClass('d-none');
                 }
             });
+        } else {
+            $input.addClass('d-none');
+            $span.removeClass('d-none');
         }
-        $span.attr('contenteditable', 'false');
     });
 
-    // Prevent deselecting by clicking inside editable again
-    $(document).on('mousedown', '.editable', function (e) {
-        e.stopPropagation();
+    //Update speaker on dropdown click
+    $('.speakerDropdown').on('click', function (e){
+        let $clicked = $(this); // store reference to clicked element
+        let data = $clicked.data();
+        let speakerNameText = $clicked.text().trim();
+        let segmentId = data.id;
+        let speaker = data.speaker;
+
+        $.ajax({
+            url: "{{ route('proof-reader.tasks.speaker.update', $task->id) }}",
+            method: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                segment_id: segmentId,
+                speaker: speaker,
+            },
+            success: function (response) {
+                toastr.success(response.message);
+                $clicked.closest('.dropdown').find('.speakerNameText').text(speakerNameText);
+            },
+            error: function () {
+                toastr.error('Something went wrong');
+            }
+        });
     });
 
-    // Click anywhere else makes all editable false
-    $(document).on('click', function () {
-        $('.editable').attr('contenteditable', 'false');
-    });
 
     function showHideSpeakerAndTimeStamp(){
         //Speaker show/hide

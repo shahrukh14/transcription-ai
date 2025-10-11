@@ -83,6 +83,7 @@
     <script src="{{asset('app-assets/js/scripts/forms/form-select2.js')}}"></script>
     <!-- END: Select2 JS-->
     <script src="{{asset('app-assets/js/scripts/extensions/ext-component-media-player.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/pickers/flatpickr/flatpickr.min.js')}}"></script>
 
 
     @include('sweetalert::alert')

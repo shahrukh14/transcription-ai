@@ -87,12 +87,15 @@
                             <span class="user-status fs-4"></span>
                         </div>
                         <span class="avatar">
-                            <img class="round" src="{{ asset('app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="avatar" height="40" width="40">
-                            <span class="avatar-status-online"></span>
+                            @if(auth()->guard('reader')->user()->image != null)
+                                <img class="round" src="{{ asset('admin/proofreaders/'.auth()->guard('reader')->user()->image) }}" alt="avatar" height="40" width="40">
+                            @else
+                                <img class="round" src="{{ asset('app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="avatar" height="40" width="40">
+                            @endif
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user">
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{{ route('proof-reader.profile')}}">
                             <i class="me-50" data-feather="user"></i>Profile
                         </a>
                         <a class="dropdown-item" href="{{ route('proof-reader.logout') }}">

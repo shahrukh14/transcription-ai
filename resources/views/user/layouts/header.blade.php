@@ -46,6 +46,8 @@
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="{{asset('assets/css/style.css')}}">
     <!-- END: Custom CSS-->
+    <link rel="stylesheet" type="text/css"
+        href="{{ asset('app-assets/vendors/css/pickers/flatpickr/flatpickr.min.css') }}">
     @stack('style')
 </head>
 <!-- END: Head-->

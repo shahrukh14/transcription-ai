@@ -12,7 +12,7 @@
                 {{ Str::limit($transcript->audio_file_original_name, 50, '...') }}
             </a>
         </td>
-        <td> {{date('d M Y, h:ia', strtotime($transcript->created_at))}} </td>
+        <td> {{date('d M Y, h:i A', strtotime($transcript->created_at))}} </td>
         <td> {{ $formattedTime }} </td>
         <td>
             @if($transcript->status == 0)

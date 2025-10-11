@@ -36,7 +36,7 @@
                                 <div class="d-flex justify-content-end">
                                     <form action="" method="GET" class="d-flex">
                                         <input type="text" name="search" id="search" class="form-control" value="{{ request('search') }}" placeholder="Search ID">
-                                        <button type="submit" class="btn btn-primary ms-1"><i class="fa fa-search"></i></button>
+                                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
                                         <a href="{{ route('admin.proof-reading.list') }}" class="btn btn-primary ms-1"><i class="fa-solid fa-rotate-right"></i></a>
                                     </form>
                                 </div>

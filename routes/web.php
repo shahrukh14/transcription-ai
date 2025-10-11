@@ -224,6 +224,7 @@ Route::prefix('user')->name('user.')->group(function () {
         //Protected Route start
         Route::get('dashboard', [UserController::class, 'dashboard'])->name('dashboard');
         Route::get('logout', [UserController::class, 'logout'])->name('logout');
+        Route::get('transactions', [UserController::class, 'transaction'])->name('transaction');
 
 
         Route::post('audio/upload', [TranscriptionController::class, 'audioUpload'])->name('audio.upload');
@@ -256,6 +257,8 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
     Route::middleware(['auth:reader'])->group(function () {
         //Protected Route start
         Route::get('dashboard', [ReaderController::class, 'dashboard'])->name('dashboard');
+        Route::get('profile', [ReaderController::class, 'profile'])->name('profile');
+        Route::post('profile/update', [ReaderController::class, 'profileUpdate'])->name('profile.update');
         Route::get('logout', [ReaderController::class, 'logout'])->name('logout');
 
         Route::get('pdf/download/{transcription}', [TranscriptionController::class, 'transcriptionPDFdownload'])->name('pdf.download');
@@ -265,10 +268,12 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
     // Tasks Route
     Route::prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', [TaskController::class, 'list'])->name('list');
+        Route::get('/my-task', [TaskController::class, 'myTask'])->name('my.task');
         Route::get('claimed-by-proof-reader/{id}', [TaskController::class, 'claimedByProofReader'])->name('claimed.by.proof.reader');
         Route::get('view/{id}',[TaskController::class,'taskView'])->name('view');
 
         Route::post('update/{id}', [TaskController::class, 'updateTaskTranscription'])->name('update');
+        Route::post('speaker-update/{id}', [TaskController::class, 'updateTranscriptionSpeaker'])->name('speaker.update');
         Route::get('mark-as-complete/{id}', [TaskController::class, 'markAsComplete'])->name('mark-as-complete');
 
     });
