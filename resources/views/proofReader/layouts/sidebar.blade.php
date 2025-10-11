@@ -11,13 +11,13 @@
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+            @if(auth()->guard('reader')->user()->status)
             <li class="@if ((request()->is('proof-reader/dashboard'))) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('proof-reader.dashboard') }}">
                     <i data-feather="home"></i>
                     <span class="menu-title text-truncate font-size-12px" data-i18n="Dashboards">@lang('Dashboards')</span>
                 </a>
             </li>
-
             <li class="@if ((request()->is('proof-reader/tasks')) || (request()->is('proof-reader/tasks/view/*'))) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('proof-reader.tasks.list') }}">
                     <i class="fa-solid fa-list"></i>
@@ -30,6 +30,14 @@
                     <span class="menu-title text-truncate font-size-12px" data-i18n="All Tasks">@lang('My Tasks')</span>
                 </a>
             </li>
+            @else
+            <li class="@if ((request()->is('proof-reader/assessment'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('proof-reader.assessment') }}">
+                    <i data-feather="home"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="Assessment">@lang('Assessment')</span>
+                </a>
+            </li>
+            @endif
         </ul>
     </div>
   </div>

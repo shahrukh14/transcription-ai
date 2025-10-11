@@ -33,8 +33,8 @@ class TranscribeController extends Controller
 
     public function details($id)
     {
-        $detail = Transcription::find($id); 
-        return view('admin.transcription.details', compact('detail'));
+        $transcription = Transcription::find($id); 
+        return view('admin.transcription.details', compact('transcription'));
     }
 
 }

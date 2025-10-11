@@ -64,13 +64,15 @@ class PaymentController extends Controller
     
             //Save Transaction into database
             Transaction::create([
-                'user_id'    => $user->id,
-                'package_id' => $package_id,
-                'payment_id' => $payment_id,
-                'order_id'   => $order_id,
-                'signature'  => $signature,
-                'amount'     => $payment->amount / 100, // convert from paisa to rupees
-                'currency'   => $payment->currency,
+                'user_id'           => $user->id,
+                'package_id'        => $package_id,
+                'payment_id'        => $payment_id,
+                'order_id'          => $order_id,
+                'signature'         => $signature,
+                'transaction_for'   => 'wallet',
+                'amount'            => $payment->amount / 100, // convert from paisa to rupees
+                'currency'          => $payment->currency,
+                'remark'            => 'Pachage Purchase',
             ]);
 
             //Update user packge in users table

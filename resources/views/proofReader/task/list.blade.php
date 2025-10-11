@@ -32,9 +32,26 @@
                             </p>
                             @endif
                             <div class="card-header border-bottom">
+                                {{-- dropdown --}}
+                                <form method="GET" action="">
+                                    <select class="form-select" name="status" onchange="this.form.submit()">
+                                        <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All</option>
+                                        <option value="claimed" {{ request('status') == 'claimed' ? 'selected' : '' }}>Claimed</option>
+                                        <option value="unclaimed" {{ request('status') == 'unclaimed' ? 'selected' : '' }}>Unclaimed</option>
+                                    </select>
+                                </form>
+                                {{-- date filter --}}
+                                <form action="" method="GET" class="d-flex align-items-center m-bottom-4 w-auto">
+                                    <div class="formData d-flex">
+                                        <input type="text" class="form-control flatpickr-input from" placeholder="From Date" name="from" value="{{ request('from') }}" />
+                                        <input type="text" class="form-control flatpickr-input to" placeholder="To Date" name="to" value="{{ request('to') }}" />
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </form>
+                                {{-- search filter --}}
                                 <form action="" method="GET" class="d-flex">
                                     <input type="text" name="search" id="search" class="form-control"
-                                        value="{{ $search }}" placeholder="Search Audio name">
+                                        value="{{ request('search') }}" placeholder="Search Audio name">
                                     <button type="submit" class="btn btn-primary mx-1"><i class="fa fa-search"></i></button>
                                     @if((request()->is('proof-reader/tasks/my-task')))
                                         <a href="{{ route('proof-reader.tasks.my.task') }}" class="btn btn-primary"><i class="fa-solid fa-rotate-right"></i></a>
@@ -49,8 +66,8 @@
                                         <tr>
                                             <th>@lang('Audio')</th>
                                             <th>@lang('Uploaded At')</th>
-                                            <th>@lang('Claim At')</th>
-                                            <th>@lang('Complete At')</th>
+                                            <th>@lang('Claimed At')</th>
+                                            <th>@lang('Completed At')</th>
                                             <th>@lang('Claim Tasks')</th>
                                         </tr>
                                     </thead>
@@ -67,14 +84,14 @@
                                             <td>{!! ($task->claimed_dt != null) ? date('d M Y, h:i A', strtotime($task->claimed_dt)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Claimed</span>' !!}</td>
                                             <td>{!! ($task->task_complete_time != null) ? date('d M Y, h:i A', strtotime($task->task_complete_time)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Completed</span>' !!}</td>
                                             <td>
-                                                @if ($task->status == "Competed")
+                                                @if ($task->status == "Completed")
                                                     <span class="badge rounded-pill badge-light-success me-1">Completed</span>
                                                 @else
                                                     <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->id]) }}">
                                                         <select name="status" id="" onchange="this.form.submit()" class="form-control">
                                                             <option value="">Select</option>
-                                                            <option value="C" {{ $task->status == 'C' ? 'selected' : '' }}>Claimed</option>
-                                                            <option value="UC" {{ $task->status == 'UC' ? 'selected' : '' }}>Unclaimed</option>
+                                                            <option value="Claimed" {{ $task->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
+                                                            <option value="Unclaimed" {{ $task->status == 'Unclaimed' ? 'selected' : '' }}>Unclaimed</option>
                                                         </select>
                                                     </form>
                                                 @endif

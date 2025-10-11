@@ -106,51 +106,35 @@
                                 <span class="text-danger" id="meta_title-error"></span>
                             </div>
                         </div>
-           
                        
-                        {{-- <div class="row mb-2">
-                            <div class="col-md-4">
-                                <label for="meta_title" class="form-label">@lang('Meta Title')</label>
-                                <input type="text" class="form-control" name="meta_title" id="meta_title" placeholder="@lang('Enter Meta Title')" value="{{ $existingSettings ? $existingSettings->meta_title : '' }}">
-                                <span class="text-danger" id="meta_title-error"></span>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="meta_description" class="form-label">@lang('Meta Description')</label>
-                                <input type="text" class="form-control" name="meta_description" id="meta_description" placeholder="@lang('Enter Meta Description')" value="{{ $existingSettings ? $existingSettings->meta_description : '' }}">
-                                <span class="text-danger" id="meta_description-error"></span>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="keyword" class="form-label">@lang('Keyword')</label>
-                                <input type="text" class="form-control" name="keyword" id="keyword" placeholder="@lang('Enter Keyword')" value="{{ $existingSettings ? $existingSettings->keyword : '' }}">
-                                <span class="text-danger" id="keyword-error"></span>
-                            </div>
-                        </div> --}}
-                        <!-- <div class="row mb-2">
-                            <div class="col-md-4">
-                                <label for="email_type" class="form-label">@lang('Mail Type')</label>
-                                <input type="text" class="form-control" name="email_type" id="email_type" placeholder="@lang('Enter Email Type')" value="{{ $existingSettings ? $existingSettings->email_type : '' }}">
-                                <span class="text-danger" id="email_type-error"></span>
-
-                            </div>
-                            <div class="col-md-4">
-                                <label for="email_setting" class="form-label">@lang('Mail userName')</label>
-                                <input type="text" class="form-control" name="email_setting" id="email_setting" placeholder="@lang('Enter Email Setting')" value="{{ $existingSettings ? $existingSettings->email_setting : '' }}">
-                                <span class="text-danger" id="email_setting-error"></span>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="mail_password" class="form-label">@lang('Mail Password')</label>
-                                <input type="password" class="form-control" name="mail_password" id="mail_password" placeholder="@lang('Enter Mail Password')" value="{{ $existingSettings ? $existingSettings->mail_password : '' }}">
-                                <span class="text-danger" id="mail_password-error"></span>
-
-                            </div>
-                        </div>
                         <div class="row mb-2">
                             <div class="col-md-4">
-                                <label for="smtp_mailhost" class="form-label">@lang('SMTP Mail Host')</label>
-                                <input type="text" class="form-control" name="smtp_mailhost" id="smtp_mailhost" placeholder="@lang('Enter SMTP Mail Host')" value="{{ $existingSettings ? $existingSettings->smtp_mailhost : '' }}">
-                                <span class="text-danger" id="smtp_mailhost-error"></span>
+                                <label for="proof_reading_per_minute" class="form-label">@lang('Proof Reading Price Per Minute')</label>
+                                <input type="number" class="form-control" name="proof_reading_per_minute" id="proof_reading_per_minute" step="any" placeholder="@lang('How much do you charge for proof reading per minute')" value="{{ $existingSettings ? $existingSettings->proof_reading_per_minute : 0 }}">
+                                <span class="text-danger" id="proof_reading_per_minute-error"></span>
                             </div>
-                        </div> -->
+                            <div class="col-md-4">
+                                <label for="speaker_marking_per_minute" class="form-label">@lang('Speaker Marking Per Minute')</label>
+                                <input type="number" class="form-control" name="speaker_marking_per_minute" id="speaker_marking_per_minute" step="any" placeholder="@lang('How much do you charge for marking speakers in proof reading per minute')" value="{{ $existingSettings ? $existingSettings->speaker_marking_per_minute : 0 }}">
+                                <span class="text-danger" id="speaker_marking_per_minute-error"></span>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                @php
+                                    if($existingSettings){
+                                        $selectedLanguage = json_decode($existingSettings->proofreading_language);
+                                    }else{
+                                        $selectedLanguage = [];
+                                    }
+                                @endphp
+                                <label class="form-label" for="select2-basic">Select Proofreading Language</label>
+                                <select class="select2 form-select languageSelect" id="select2-basic" name="proofreading_language[]" multiple>
+                                    <option value="" disabled>Select Language</option>
+                                    @foreach ($languages as $language)
+                                        <option value="{{$language}}" @if(in_array($language, $selectedLanguage)) selected @endif>{{Illuminate\Support\Str::ucfirst($language)}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary">@lang('Save Settings')</button>
                     </form>
                 </div>
@@ -159,3 +143,11 @@
     </div>
 </div>
 @endsection
+
+@push('script')
+<script>
+$(document).ready(function(){
+    
+});
+</script>
+@endpush

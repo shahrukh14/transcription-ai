@@ -35,6 +35,7 @@
     <!-- BEGIN: Page CSS-->
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/core/menu/menu-types/horizontal-menu.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/pages/dashboard-ecommerce.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/pages/app-ecommerce.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/charts/chart-apex.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/plugins/extensions/ext-component-toastr.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('app-assets/css/pages/page-pricing.css')}}">
@@ -109,11 +110,15 @@
                             <span class="user-name fw-bolder">{{auth()->user()->fullName()}}</span>
                         </div>
                         <span class="avatar">
-                            <img class="round" src="{{asset('app-assets//images/portrait/small/avatar-s-11.jpg')}}" alt="avatar" height="40" width="40">
+                            @if(auth()->user()->image != null)
+                                <img class="round" src="{{ asset('user/'.auth()->user()->image) }}" alt="avatar" height="40" width="40">
+                            @else
+                                <img class="round" src="{{ asset('app-assets/images/portrait/small/avatar-s-11.jpg') }}" alt="avatar" height="40" width="40">
+                            @endif
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user">
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="{{ route('user.profile')}}">
                             <i class="me-50" data-feather="user"></i> Profile
                         </a>
                         <div class="dropdown-divider"></div>

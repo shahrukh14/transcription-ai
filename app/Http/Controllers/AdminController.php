@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Models\Task;
+use App\Models\User;
 use App\Models\Admin;
+use App\Models\Package;
 use Illuminate\Http\Request;
+use App\Models\Transcription;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -14,10 +18,20 @@ use Spatie\Permission\Models\Permission;
 
 class AdminController extends Controller
 {
-  public function dashboard(Request $request)
-  {
-    return view('admin.dashboard');
-  }
+    public function dashboard(Request $request){
+        $users = User::count();
+        $transcriptions = Transcription::count();
+        $activeTasks = Task::where('claimed_by', '!=', NULL)->count();
+        $packages = Package::count();
+        $data = [
+            'users' => $users,
+            'transcriptions' => $transcriptions,
+            'activeTasks' => $activeTasks,
+            'packages' => $packages,
+        ];
+        return view('admin.dashboard', $data);
+    }
+
   public function userList(Request $request)
   {
     $users = Admin::paginate(10);

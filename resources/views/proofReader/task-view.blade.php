@@ -1,5 +1,5 @@
 @extends('proofReader.layouts.layout')
-@section('title', 'Transcription View')
+@section('title', 'Task View')
 @section('content')
     <!-- BEGIN: Content-->
     <div class="app-content content ">
@@ -22,19 +22,25 @@
                                     {{ $task->transcription->audio_file_original_name }}
                                 </h4>
                                 <h6 class="card-title">
-                                    @if($task->transcription->status == 0)
-                                        <span class="badge rounded-pill badge-light-warning me-1">Untranscribed</span>
+                                    @if ($task->status == "Completed")
+                                        <span class="badge rounded-pill badge-light-success me-1">Completed</span>
+                                    @elseif($task->status == "Claimed")
+                                        <span class="badge rounded-pill badge-light-warning me-1">Claimed</span>
+                                    @elseif($task->status == "Unclaimed")
+                                        <span class="badge rounded-pill badge-light-danger me-1">Unclaimed</span>
+                                    @elseif($task->status == "Cancelled")
+                                        <span class="badge rounded-pill badge-light-danger me-1">Cancelled</span>
                                     @else
-                                        <span class="badge rounded-pill badge-light-success me-1">Transcribed</span>
+                                        <span class="badge rounded-pill badge-light-secondary me-1">Not Claimed</span>
                                     @endif
                                 </h6>
                             </div><hr>
                             <div class="card-body pt-0">
                                 <div class="row">
-                                    <p class="fw-bolder">{{date('d M Y, h:i A', strtotime($task->transcription->created_at))}}</p>
+                                    <p class="fw-bolder">{{date('d M Y, h:i A', strtotime($task->created_at))}}</p>
                                     <div class="form-floating col-md-12">
                                         @php 
-                                            $transcription_segments = $task->transcription_segments == null ? $task->transcription->transcription_segments : $task->transcription_segments;
+                                            $transcription_segments = $task->transcription_segments;
                                         @endphp
                                         @foreach (json_decode($transcription_segments)??[] as $segment)
                                             @php
@@ -45,36 +51,34 @@
                                                 $formattedTime  = sprintf("%02d:%02d", $minutes, $roundedSeconds);
                                             @endphp
                                             <div class="pt-1">
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0 fw-bolder speakerNameText" data-bs-toggle="dropdown">
-                                                        {{ $allSpeakers[$segment->speaker] }}
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-right">
-                                                        @foreach ($allSpeakers as $speakrValue => $speakerName)
-                                                        <a class="dropdown-item speakerDropdown" href="#" title="View Transcription" data-speaker="{{$speakrValue}}" data-id="{{ $segment->id }}" >
-                                                            <span>{{$speakerName}}</span>
-                                                        </a>
-                                                        @endforeach
+                                                <div class="d-flex justify-content-start gap-1">
+                                                    <div class="dropdown speaker">
+                                                        <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0 fw-bolder speakerNameText" data-bs-toggle="dropdown">
+                                                            {{ $allSpeakers[$segment->speaker] }}
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            @foreach ($allSpeakers as $speakrValue => $speakerName)
+                                                                <a class="dropdown-item speakerDropdown" href="#" data-speaker="{{ $speakrValue }}" data-id="{{ $segment->id }}">
+                                                                    <span>{{ $speakerName }}</span>
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
                                                     </div>
+                                                    <span class="playAudio" data-start="{{ $segment->start }}" data-end="{{ $segment->end }}">
+                                                        <i class="fa-solid fa-volume-high"></i>
+                                                    </span>
+                                                    <span class="addSegment" data-id="{{ $segment->id }}" data-language="{{ $segment->language }}">
+                                                        <i class="fa-solid fa-square-plus" style="cursor: pointer;"></i>
+                                                    </span>
                                                 </div>
-                                                {{-- <span class="fw-bolder speaker">{{ $allSpeakers[$segment->speaker] }}</span>
-                                                <span class="playAudio" data-start="{{ $segment->start }}"> <i class="fa-solid fa-volume-high"></i></span> --}}
-                                                <p class="@if($task->status != 'Complete') segment @endif segment-style" data-start="{{ $segment->start }}" data-id="{{ $segment->id }}" data-speaker="{{ $segment->speaker }}">
+                                                <p class="@if($task->status != 'Completed') segment @endif segment-style" data-start="{{ $segment->start }}" data-end="{{ $segment->end }}" data-id="{{ $segment->id }}" data-speaker="{{ $segment->speaker }}">
                                                     <span style="color: #717272" class="time-stamp">({{ $formattedTime }})</span>
                                                     <span class="editable-text">{{ $segment->text }}</span>
-                                                    <input type="text" class="form-control edit-input d-none" value="{{ $segment->text }}">
+                                                    <input type="text" class="form-control edit-input d-none" value="{{$segment->text}}">
                                                 </p>
                                             </div>
                                         @endforeach
                                     </div>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="w-100">
-                                    <h6 class="card-title text-center mb-0">{{ $task->transcription->audio_file_original_name }}</h6>
-                                    <audio id="plyr-audio-player" class="audio-player w-100" controls>
-                                        <source src="{{ asset('user/audios/' . $task->transcription->audio_file_name) }}" type="audio/mp3" />
-                                    </audio>
                                 </div>
                             </div>
                         </div>
@@ -82,24 +86,50 @@
                     <div class="col-xl-3 col-md-3 col-3">
                         <div class="card">
                             <div class="card-body">
+                                <div>
+                                    <span class="fw-bolder h4">Proof Reading Cost : ₹ {{number_format($task->price,2)}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
                                 <h4>Export</h4>
                                 <ul class="list-group mb-1">
                                     <li class="list-group-item">
-                                        <a href="{{ route('proof-reader.pdf.download',$task->transcription->id) }}" title="PDF Download" id="pdfDownloadUrl" data-base-url="{{ route('user.transcription.pdf.download', $task->transcription->id) }}">
-                                            <i class="fa-solid fa-file-pdf"></i>Download PDF
+                                        <a href="{{ route('proof-reader.pdf.download',$task->id) }}" title="PDF Download" id="pdfDownloadUrl" data-base-url="{{ route('proof-reader.pdf.download',$task->id) }}">
+                                            <i class="fa-solid fa-file-pdf"></i> Download PDF
                                         </a>
                                     </li>
                                     <li class="list-group-item">
-                                        <a href="{{ route('proof-reader.docx.download',$task->transcription->id) }}" title="PDF Download" id="docxDownloadUrl" data-base-url="{{ route('user.transcription.docx.download', $task->transcription->id) }}">
-                                            <i class="fa-solid fa-file-word"></i>Download DOCX
+                                        <a href="{{ route('proof-reader.docx.download',$task->id) }}" title="PDF Download" id="docxDownloadUrl" data-base-url="{{ route('proof-reader.docx.download',$task->id) }}">
+                                            <i class="fa-solid fa-file-word"></i> Download DOCX
                                         </a>
                                     </li>
                                     <li class="list-group-item">
                                         <a href="{{ asset('user/audios/' . $task->transcription->audio_file_name) }}" title="Download Audio File"  download="{{$task->transcription->audio_file_original_name}}">
-                                            <i class="fa-solid fa-cloud-arrow-down"></i>Download Audio
+                                            <i class="fa-solid fa-cloud-arrow-down"></i> Download Audio
+                                        </a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <a href="#" title="Rename Speaker" class="renameSpeakerButton" data-id="{{$task->id}}">
+                                            <i class="fa-solid fa-user-pen"></i> Rename Speaker
                                         </a>
                                     </li>
                                 </ul>
+
+                                @if($task->attachment != null)
+                                <h4 class="mb-1">Attachments</h4>
+                                <div class="row">
+                                    @foreach (json_decode($task->attachment) as $attachment)
+                                        <div class="col-md-12 mb-1">
+                                            <a href="{{ asset('proofreading/attachments/' . $attachment) }}" title="Download Attachment" download="{{$attachment}}">
+                                                <i class="fa-solid fa-file-arrow-down"></i> {{$attachment}}
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                @endif
+
                                 <h4 class="mb-1">More</h4>
                                 <div class="row">
                                     <div class="col-md-12 mb-1">
@@ -117,7 +147,7 @@
                                 </div>
                             </div>
                         </div>
-                        @if($task->status == "Complete")
+                        @if($task->status == "Completed")
                             <button type="button" class="btn btn-success w-100" disabled> Completed </button>
                         @else
                             <a href="{{ route('proof-reader.tasks.mark-as-complete', ['id' => $task->id]) }}"  class="btn btn-success w-100"> Mark as complete </a>
@@ -126,47 +156,104 @@
                 </div>   
             </div>
         </div>
-    </div> 
+    </div>
+    <!-- AUDIO Player-->
+    <div class="col-12" id="sticky-audio-wrapper">
+        <div class="card" id="sticky-audio-player">
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <div style="width: 53%; margin-left:8%;">
+                    <h6 class="card-title text-center mb-0">{{ $task->transcription->audio_file_original_name }}</h6>
+                    <audio id="plyr-audio-player" class="audio-player w-100" controls>
+                        <source src="{{ asset('user/audios/' . $task->transcription->audio_file_name) }}" type="audio/mp3" />
+                    </audio>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ AUDIO Player -->
     <!-- END: Content-->
 @endsection
 
 @push('modal')
-<!-- Edit Modal Start-->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+<!-- add segment Modal Start-->
+<div class="modal fade" id="addSegmentModal" tabindex="-1" aria-labelledby="addSegmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form action="{{ route('proof-reader.tasks.update',$task->id) }}" method="POST">
-            @csrf
+            <form action="{{ route('proof-reader.tasks.segment.add', $task->id) }}" method="POST">
+                @csrf
                 <div class="modal-header">
-                    <h4 class="modal-title" id="editModalLabel"> <i class="fa-solid fa-pen-to-square"></i> Edit Transcription</h4>
+                    <h4 class="modal-title text-center" id="addSegmentModalLabel"><i class="fa-solid fa-plus-square"></i> Add Segment</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="segment_id" id="segment_id">
                     <div class="row">
                         <div class="col-md-12 mb-1">
-                            <label for="speaker_select" class="form-label"><i class="fa-solid fa-user"></i> Speaker</label>
-                            <select class="form-select select2" id="speaker_select" name="speaker" aria-label="Speaker count selection" >
-                                <option selected disabled>Speaker</option>
-                                @foreach ($allSpeakers as $key => $name)
-                                    <option value="{{$key}}">{{$name}}</option>
+                            <label for="text" class="form-label">Text<span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="text" id="text" placeholder="Enter transcription" required></textarea>
+                        </div>
+                        <div class="col-md-12 mb-1">
+                            <label for="speaker_select" class="form-label">Speakers <span class="text-danger">*</span></label>
+                            <select class="select2 form-select" id="speaker_select" name="speaker" required>
+                                <option value="">Select speaker</option>
+                                @foreach ($allSpeakers as $speakrValue => $speakerName)
+                                    <option value="{{$speakrValue}}">{{$speakerName}}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-12 mb-1">
-                            <label for="text" class="form-label"><i class="fa-solid fa-file-lines"></i> Text</label>
-                            <textarea class="form-control" name="text" id="text"></textarea>
+                        <div class="col-md-6 mb-1">
+                            <label for="start_time" class="form-label">Start Time (in seconds)<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="start_time" id="start_time" step="any" required>
                         </div>
-                    </div> 
+                        <div class="col-md-6 mb-1">
+                            <label for="end_time" class="form-label">End Time (in seconds)<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="end_time" id="end_time" step="any" required>
+                        </div>
+                        <input type="hidden" name="language" id="segment_language">
+                        <input type="hidden" name="previous_segment_id" id="previous_segment_id">
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<!-- Edit Modal End-->
+<!-- add segment Modal End-->
+
+<!-- Speaker Rename Modal Start-->
+<div class="modal fade" id="speakerRenameModal" tabindex="-1" aria-labelledby="speakerRenameModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form action="{{ route('proof-reader.tasks.speaker.rename') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h4 class="modal-title text-center" id="speakerRenameModalLabel"><i class="fa-solid fa-user-pen"></i> Rename Speaker</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="task_id" name="task_id">
+                    @foreach ($allSpeakers as $speakrValue => $speakerName)
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="speaker" class="form-label">Default Name</label>
+                            <input type="text" class="form-control mb-1" id="speaker" value="{{$speakerName}}" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="new_name" class="form-label">New Name</label>
+                            <input type="text" class="form-control mb-1" name="{{$speakrValue}}" id="new_name" placeholder="Enter new name" value="{{$speakerName}}">
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Rename</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Speaker Rename Modal End-->
 @endpush
 
 @push('style')
@@ -178,8 +265,41 @@
         margin-top: 6px;
         padding: 3px 1px 3px 1px; 
     }
+   
+    input[type=checkbox] ~ label, input[type=radio] ~ label {
+        line-height: 24px !important;
+    }
+
+    #sticky-audio-wrapper {
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+        z-index: 1050; /* High z-index so it stays above other content */
+    }
+
+    #sticky-audio-player {
+        border-radius: 0;
+        margin: 0;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15); /* Shadow only on top to give floating feel */
+        background-color: #fff;
+    }
+
+    #sticky-audio-player .card-body {
+        padding: 0.5rem 1rem;
+    }
+
+    .audio-player {
+        width: 100%;
+        display: block;
+    }
+
     .playAudio{
         cursor: pointer;
+    }
+
+    .highlight {
+        background-color: yellow;
+        border-radius: 4px;
     }
 
 </style>
@@ -189,6 +309,9 @@
 <script> 
 $(document).ready(function () {
     let originalText = '';
+    let segmentEndTime = null;
+    const audio = document.getElementById('plyr-audio-player');
+
     //select2 initialization
     $('.select2').select2({
         placeholder: "Select",
@@ -213,14 +336,7 @@ $(document).ready(function () {
     showHideSpeakerAndTimeStamp();
     updateDownloadUrl();
 
-    const audio = document.getElementById('plyr-audio-player');
-
-    // Segment hover background dark
-    // $('.segment').on('mouseover', function () {
-    //     $(this).css('background-color', '#c0c0c073');
-    // }).on('mouseout', function () {
-    //     $(this).css('background-color', 'transparent');
-    // });
+   
 
     //Time Stamp show/hide
     $('#timestamp_visible').on('click', function (){
@@ -236,8 +352,10 @@ $(document).ready(function () {
         updateDownloadUrl();
     });
 
+
     // On span click → hide span, show input
     $(document).on('click', '.segment .editable-text', function () {
+        audio.pause();
         let $span = $(this);
         let $p = $span.closest('.segment');
         let $input = $p.find('.edit-input');
@@ -284,7 +402,7 @@ $(document).ready(function () {
             $span.removeClass('d-none');
         }
     });
-
+ 
     //Update speaker on dropdown click
     $('.speakerDropdown').on('click', function (e){
         let $clicked = $(this); // store reference to clicked element
@@ -300,6 +418,7 @@ $(document).ready(function () {
                 _token: "{{ csrf_token() }}",
                 segment_id: segmentId,
                 speaker: speaker,
+                speaker_name: speakerNameText,
             },
             success: function (response) {
                 toastr.success(response.message);
@@ -311,6 +430,82 @@ $(document).ready(function () {
         });
     });
 
+    //Rename Speaker
+    $(document).on('click', '.renameSpeakerButton', function(e){
+        e.preventDefault();
+        let id = $(this).data('id');
+        let modal = $('#speakerRenameModal');
+        modal.find('#task_id').val(id);
+        modal.modal('show');
+    });
+    
+    $('.playAudio').on('click', function () {
+        let start = parseFloat($(this).data('start'));
+        let end = parseFloat($(this).data('end'));
+        segmentEndTime = end; // Set segment end time
+
+        // Play audio from the start time
+        playAudio(start);
+
+        // Highlight current segment (manually, once)
+        $('.editable-text').removeClass('highlight');
+        let $segment = $(this).closest('.pt-1').find('.segment-style');
+        $segment.find('.editable-text').addClass('highlight');
+    });
+
+    function playAudio(startTime) {
+        if (audio.readyState >= 1) {
+            audio.pause();
+            audio.currentTime = startTime;
+            audio.addEventListener('seeked', function onSeeked() {
+                audio.play();
+                audio.removeEventListener('seeked', onSeeked);
+            });
+        } else {
+            audio.addEventListener('loadedmetadata', function onLoadedMeta() {
+                audio.currentTime = startTime;
+                audio.addEventListener('seeked', function onSeeked() {
+                    audio.play();
+                    audio.removeEventListener('seeked', onSeeked);
+                });
+                audio.removeEventListener('loadedmetadata', onLoadedMeta);
+            });
+        }
+    }
+
+        // Auto highlight the sentence based on audio time
+    function highlightSegmentByTime(currentTime) {
+        // Only highlight the next sentence after the current one finishes
+        if (segmentEndTime && currentTime > segmentEndTime) {
+            $('.editable-text.highlight').removeClass('highlight');
+            
+            // Find the next segment to highlight
+            let $nextSegment = $('.segment-style').filter(function () {
+                return parseFloat($(this).data('start')) > segmentEndTime;
+            }).first();
+
+            if ($nextSegment.length) {
+                segmentEndTime = parseFloat($nextSegment.data('end')); // Update the end time
+                $nextSegment.find('.editable-text').addClass('highlight'); // Highlight next sentence
+            } else {
+                segmentEndTime = null; // No more segments
+            }
+        }
+    }
+
+    audio.addEventListener('timeupdate', function () {
+        let currentTime = audio.currentTime;
+        highlightSegmentByTime(currentTime);
+    });
+
+    //add segment modal open
+    $('.addSegment').on('click', function () {
+        let $data = $(this).data();
+        let modal = $('#addSegmentModal');
+        modal.find('#previous_segment_id').val($data.id);
+        modal.find('#segment_language').val($data.language);
+        modal.modal('show');
+    });
 
     function showHideSpeakerAndTimeStamp(){
         //Speaker show/hide
@@ -342,35 +537,6 @@ $(document).ready(function () {
         $('#pdfDownloadUrl').attr('href', pdfFullUrl);
         $('#docxDownloadUrl').attr('href', docxFullUrl);
     }
-
-    $('.playAudio').on('click', function () {
-        let time = $(this).data('start');
-        let startTime = parseFloat(time);
-        playAudio(startTime)
-    });
-
-    function playAudio(startTime){
-        if (audio.readyState >= 1) { // Audio is loaded
-            audio.pause(); // Pause first to avoid overlapping play
-            audio.currentTime = startTime;
-
-            // Wait for seek to complete
-            audio.addEventListener('seeked', function onSeeked() {
-                audio.play();
-                audio.removeEventListener('seeked', onSeeked); // remove listener after it fires
-            });
-        } else {
-            audio.addEventListener('loadedmetadata', function onLoadedMeta() {
-                audio.currentTime = startTime;
-                audio.addEventListener('seeked', function onSeeked() {
-                    audio.play();
-                    audio.removeEventListener('seeked', onSeeked);
-                });
-                audio.removeEventListener('loadedmetadata', onLoadedMeta);
-            });
-        }
-    }
-
 });
 </script>
 @endpush

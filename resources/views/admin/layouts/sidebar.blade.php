@@ -44,6 +44,13 @@
                 </a>
             </li>
 
+            <li class="@if ((request()->is('admin/proof-reader/assessments')) || (request()->is('admin/proof-reader/assessments/add')) || (request()->is('admin/proof-reader/edit'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.assessments.list') }}">
+                    <i class="fa-solid fa-spell-check"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="Assessments">@lang('Assessments')</span>
+                </a>
+            </li>
+
             <li class="@if ((request()->is('admin/package')) || (request()->is('admin/package/add')) || (request()->is('admin/package/edit'))) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('admin.package.list') }}">
                     <i class="fa-solid fa-cubes"></i>

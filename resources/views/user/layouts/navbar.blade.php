@@ -44,30 +44,24 @@
             <!-- Horizontal menu content-->
             <div class="navbar-container main-menu-content" data-menu="menu-container">
                 <ul class="nav navbar-nav" id="main-menu-navigation" data-menu="menu-navigation">
-                    <li class="dropdown nav-item" data-menu="dropdown">
-                        <a class="dropdown-toggle nav-link d-flex align-items-center" href="index.html" data-bs-toggle="dropdown">
-                            <i data-feather="home"></i>
-                            <span data-i18n="Dashboards">Dashboards</span>
+                    <li class="dropdown nav-item @if((request()->is('user/dashboard'))) active @endif">
+                        <a class="nav-link d-flex align-items-center" href="{{route('user.dashboard')}}">
+                            <i data-feather="home"></i><span>Dashboards</span>
                         </a>
-                        <ul class="dropdown-menu" data-bs-popper="none">
-                            <li data-menu="">
-                                <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="" data-i18n="Analytics">
-                                    <i data-feather="activity"></i>
-                                    <span data-i18n="Analytics">Analytics</span>
-                                </a>
-                            </li>
-                            <li class="active" data-menu="">
-                                <a class="dropdown-item d-flex align-items-center" href="#" data-bs-toggle="" data-i18n="eCommerce">
-                                    <i data-feather="shopping-cart"></i>
-                                    <span data-i18n="eCommerce">eCommerce</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
-                    <li class="dropdown nav-item" data-menu="dropdown">
+                    <li class="dropdown nav-item @if((request()->is('user/transactions'))) active @endif">
                         <a class="nav-link d-flex align-items-center" href="{{route('user.transaction')}}">
-                            <i data-feather="home"></i>
-                            <span data-i18n="Dashboards">Transaction</span>
+                            <i class="fa-regular fa-credit-card"></i><span>Transaction</span>
+                        </a>
+                    </li>
+                    <li class="dropdown nav-item @if((request()->is('user/proof-reading'))) active @endif">
+                        <a class="nav-link d-flex align-items-center" href="{{route('user.proof.reading')}}">
+                            <i class="fa-regular fa-file"></i><span>Proof Reading</span>
+                        </a>
+                    </li>
+                    <li class="dropdown nav-item @if((request()->is('user/wallet*'))) active @endif">
+                        <a class="nav-link d-flex align-items-center" href="{{route('user.wallet')}}">
+                            <i class="fa-solid fa-wallet"></i><span>Wallet</span>
                         </a>
                     </li>
                 </ul>

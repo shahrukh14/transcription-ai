@@ -15,7 +15,7 @@
         @endif
         <div class="content-body">
             <div class="row">
-                <div class="col-xl-3 col-md-3 col-12">
+                {{-- <div class="col-xl-3 col-md-3 col-12">
                     <div class="card">
                         <div class="card-header bg-black">
                             @php
@@ -50,14 +50,15 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
-                <div class="col-xl-9 col-md-9 col-12">
+                <div class="col-xl-12 col-md-12 col-12">
                     <div class="card">
                         <div class="card-header pb-0">
                             <h4 class="card-title">
-                                <i class="fa-solid fa-bars"></i> Recent Files
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Audio File
                             </h4>
+                            <a href="{{ route('pricing') }}" class="btn btn-outline-primary">GO UNLIMITED</a>
                         </div><hr>
                         <div class="card-body">
                             <div class="text-center p-1">
@@ -103,7 +104,7 @@
 @push('modal')
 <!-- Drop Zone Modal Start-->
 <div class="modal fade" id="dropZoneModal" tabindex="-1" aria-labelledby="dropZoneModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="dropZoneModalLabel">Audio Upload</h5>
@@ -297,6 +298,7 @@ $(document).ready(function () {
 
     // Get Transcription function call on page load
     renderTranscriptionTable();
+    getTranscription();
 
     // Disable Dropzone auto discovery globally
     Dropzone.autoDiscover = false;

@@ -11,10 +11,16 @@ class Task extends Model
     protected $table = "tasks";
     protected $guarded = [];
 
+    public function proofReader()
+    {
+        return $this->belongsTo(ProofReader::class, 'claimed_by');
+    }
+
     public function transcription()
     {
         return $this->belongsTo(Transcription::class, 'transcription_id');
     }
+
     public function getProofreader()
     {
         return $this->belongsTo(ProofReader::class, 'claimed_by', 'id');

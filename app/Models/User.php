@@ -66,5 +66,32 @@ class User extends Authenticatable
     public function audioTrascriptionWithCurrentPackage(){
         return $this->hasMany(Transcription::class, "user_id")->where('transcribe_with_package', $this->currentSubscription->id)->count();
     }
+
+    public function credits(){
+        return $this->hasMany(Wallet::class, "user_id")->where('type', 'credit');
+    }
+
+    public function debits(){
+        return $this->hasMany(Wallet::class, "user_id")->where('type', 'debit');
+    }
+
+    public function totalTransfers(){
+        return $this->hasMany(Wallet::class, "user_id");
+    }
+
+    public function proofReadings(){
+        return $this->hasManyThrough(
+            Task::class, 
+            Transcription::class,
+            'user_id', // Foreign key on transcriptions table
+            'transcription_id', // Foreign key on tasks table
+            'id', // Primary key on users table
+            'id', // Primary key on transcriptions table
+        );
+    }
+
+    public function amountOnHold(){
+        return $this->proofReadings()->where('tasks.status', 'Claimed')->where('tasks.payment', 'Pending')->sum('tasks.price');
+    }
    
 }
