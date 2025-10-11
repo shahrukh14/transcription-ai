@@ -29,6 +29,8 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/vendors/css/extensions/toastr.min.css') }}">
     <!-- END: Vendor CSS-->
 
+    <link rel="stylesheet" type="text/css" href="{{asset('app-assets/vendors/css/extensions/plyr.min.css')}}">
+    
     <!-- BEGIN: Theme CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/bootstrap.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('app-assets/css/bootstrap-extended.css') }}">

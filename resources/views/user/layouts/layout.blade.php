@@ -1,8 +1,10 @@
  <!--HEADER INCLUDE-->
  @include('user.layouts.header')
 
- <!--SIDEBAR INCLUDE-->
- @include('user.layouts.navbar')
+ <!--TOPBAR INCLUDE-->
+ @auth
+    @include('user.layouts.navbar')
+ @endauth
 
  <!--MAIN CONTENT -->
  @yield('content')

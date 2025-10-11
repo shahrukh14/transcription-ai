@@ -54,7 +54,11 @@
                                         @foreach ($tasks as $index => $task)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $task->getTranscriptionDetails->audio_file_name }}</td>
+                                            <td>
+                                                <a href="{{ route('proof-reader.tasks.view',$task->id) }}">
+                                                    {{ $task->transcription->audio_file_name }}
+                                                </a>
+                                            </td>
                                             <td>
                                                <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->id]) }}">
                                                <select name="status" id="" onchange="this.form.submit()" class="form-control">

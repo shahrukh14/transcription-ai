@@ -53,7 +53,7 @@ class TranscriptionController extends Controller
                 }
 
                 //transcription limit validation
-                if ($subscription->transcription_limit != 0) {// if transcription limit is set as 0 then its inlimited
+                if ($subscription->transcription_limit != 0) {// if transcription limit is set as 0 then its unlimited
                     $audioTrascriptionWithCurrentPackage = auth()->user()->audioTrascriptionWithCurrentPackage();
                     $remianingTranscription = $subscription->transcription_limit - $audioTrascriptionWithCurrentPackage;
                     if($remianingTranscription < 1){// Check if user has reached the transcription limit
@@ -337,7 +337,7 @@ class TranscriptionController extends Controller
             ]);
 
             $addToTasks                 = new Task();
-            $addToTasks->audio_id       = $id;
+            $addToTasks->transcription_id       = $id;
             $addToTasks->uploaded_dt    = Date::now();
             $addToTasks->level          = 1;
             $addToTasks->save();
@@ -361,4 +361,5 @@ class TranscriptionController extends Controller
             return redirect()->back();
         }
     }
+
 }

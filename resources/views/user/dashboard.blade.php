@@ -7,6 +7,12 @@
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper container-xxl p-0">
         <div class="content-header row"></div>
+        @if (Session::has('success'))
+            <p class="alert alert-success text-center fs-3 py-1">{{ Session::get('success') }}</p>
+        @endif
+        @if (Session::has('error'))
+            <p class="alert alert-danger text-center fs-3 py-1"> {{ Session::get('error') }}</p>
+        @endif
         <div class="content-body">
             <div class="row">
                 <div class="col-xl-3 col-md-3 col-12">
@@ -50,7 +56,7 @@
                     <div class="card">
                         <div class="card-header pb-0">
                             <h4 class="card-title">
-                                <i class="fa-solid fa-bars"></i>  Recent Files
+                                <i class="fa-solid fa-bars"></i> Recent Files
                             </h4>
                         </div><hr>
                         <div class="card-body">
@@ -103,7 +109,7 @@
                 <h5 class="modal-title" id="dropZoneModalLabel">Audio Upload</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body">
                 <!-- Dropzone Div -->
                 <div id="audioDropzone" data-upload-url="{{ route('user.audio.upload') }}">
                     <div class="dz-message" data-dz-message>
@@ -120,6 +126,7 @@
                     <div class="col-md-12 mb-1">
                         <label class="form-label" for="select2-basic">Select Audio Language</label>
                         <select class="select2 form-select languageSelect" id="select2-basic">
+                            <option selected disabled>Select Language</option>
                             @foreach ($languages as $language)
                                 <option value="{{$language}}">{{Illuminate\Support\Str::ucfirst($language)}}</option>
                             @endforeach
@@ -188,6 +195,10 @@
 <!-- Dropzone CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
 <style>
+
+    body {
+        overflow-x: hidden;
+    }
     .content-body{
         margin: 40px 0 40px 0;
     }

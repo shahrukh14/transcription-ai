@@ -38,14 +38,14 @@
                                         <div class="formData d-flex">
                                             <input type="text" class="form-control flatpickr-input from" placeholder="From Date" name="from" 
                                                 value="{{ request('from') }}" />
-                                            <input type="text" class="form-control flatpickr-input to ms-2" placeholder="To Date" name="to" 
+                                            <input type="text" class="form-control flatpickr-input to ms-.5" placeholder="To Date" name="to" 
                                                 value="{{ request('to') }}" />
                                         </div>
-                                        <button type="submit" class="btn btn-primary ms-2">Search</button>
+                                        <button type="submit" class="btn btn-primary ms-.5">Search</button>
                                     </form>
                                     <form action="" method="GET" class="d-flex">
                                         <input type="text" name="search" id="search" class="form-control ms-2" value="{{ request('search') }}" placeholder="Search Name">
-                                        <button type="submit" class="btn btn-primary ms-1"><i class="fa fa-search"></i></button>
+                                        <button type="submit" class="btn btn-primary ms-.5"><i class="fa fa-search"></i></button>
                                     </form>
                 
                                     <a href="{{ url()->current() }}" class="btn btn-primary ms-1"><i class="fa-solid fa-rotate-right"></i></a>
@@ -92,7 +92,7 @@
                                                 @endforeach
                                             @else
                                                 <tr class="text-center">
-                                                    <td colspan="6">No data found</td>
+                                                    <th colspan="6">No data found</th>
                                                 </tr>
                                             @endif
                                         </tbody>

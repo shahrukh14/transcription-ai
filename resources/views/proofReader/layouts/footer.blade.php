@@ -18,8 +18,10 @@
 {{-- <script src="{{asset('assets/jquery.min.js')}}"></script> --}}
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.0/jquery-ui.min.js"></script>
 <!-- BEGIN: Page Vendor JS-->
-{{-- <script src="{{asset('app-assets/vendors/js/charts/apexcharts.min.js')}}"></script>
-<script src="{{asset('app-assets/vendors/js/extensions/toastr.min.js')}}"></script> --}}
+{{-- <script src="{{asset('app-assets/vendors/js/charts/apexcharts.min.js')}}"></script> --}}
+<script src="{{asset('app-assets/vendors/js/extensions/toastr.min.js')}}"></script>
+<script src="{{asset('app-assets/js/scripts/extensions/ext-component-toastr.js')}}"></script>
+
 <!-- END: Page Vendor JS-->
 
 <!-- BEGIN: Theme JS-->
@@ -42,7 +44,8 @@
 <script src="{{asset('assets/js/scripts.js')}}"></script>
 <script src="{{asset('assets/js/graph.js')}}"></script>
 <script src="{{asset('assets/js/chart.min.js')}}"></script>  
-
+<script src="{{asset('app-assets/vendors/js/extensions/plyr.min.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/extensions/plyr.polyfilled.min.js')}}"></script>
 <!-- END:Custom Page JS-->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
    <!-- BEGIN: Select2 JS-->
@@ -53,7 +56,7 @@
  <script src="{{asset('app-assets/js/scripts/pages/app-ecommerce-checkout.js')}}"></script>
  <script src="{{asset('app-assets/vendors/js/forms/repeater/jquery.repeater.min.js')}}"></script>
  <script src="{{asset('app-assets/js/scripts/forms/form-repeater.js')}}"></script>
- {{-- <script src="{{asset('app-assets/js/scripts/charts/chart-chartjs.js')}}"></script> --}}
+ <script src="{{asset('app-assets/js/scripts/extensions/ext-component-media-player.js')}}"></script>
  <script>
     $(window).on('load', function() {
         if (feather) {

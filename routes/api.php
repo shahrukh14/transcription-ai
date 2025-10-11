@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\LeadsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +21,4 @@ use App\Http\Controllers\API\LeadsController;
 
 Route::middleware('auth:sanctum')->group(function(){
     
-});
-
-Route::post('leads-insert', [LeadsController::class, 'insertLeads'])->name('leads.insert');
-
+}); 

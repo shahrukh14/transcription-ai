@@ -13,12 +13,14 @@ use App\Http\Controllers\ReaderController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DynamicController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\TranscribeController;
 use App\Http\Controllers\ProofReaderController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\SubscriptionsController;
 use App\Http\Controllers\TranscriptionController;
 use App\Http\Controllers\Auth\UserLogincontroller;
@@ -26,6 +28,7 @@ use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\GeneralsettingsController;
 use App\Http\Controllers\ProofReader\TaskController;
 use App\Http\Controllers\RoleAndPermissionController;
+use App\Http\Controllers\Admin\ProofReadingController;
 
 
 
@@ -148,6 +151,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('detail/{id}', [TranscribeController::class, 'details'])->name('detail');
         });
 
+        //transaction
+        Route::prefix('transaction')->name('transaction.')->group(function () {
+            Route::get('/', [TransactionController::class, 'list'])->name('list');
+            Route::get('detail/{id}', [TransactionController::class, 'details'])->name('detail');
+        });
+
 
         //Customers
         Route::prefix('customers')->name('customers.')->group(function () {
@@ -182,6 +191,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         //Spatie Protected Routes
         Route::middleware(['permission'])->group(function () {
         });
+
+        //Proof Reading
+        Route::prefix('proof-reading')->name('proof-reading.')->group(function () {
+            Route::get('/', [ProofReadingController::class, 'index'])->name('list');
+            Route::get('view/{id}', [ProofReadingController::class, 'view'])->name('view');
+        });
+        
     });
 });
 
@@ -211,6 +227,8 @@ Route::prefix('user')->name('user.')->group(function () {
 
 
         Route::post('audio/upload', [TranscriptionController::class, 'audioUpload'])->name('audio.upload');
+
+        //Transcription Routes
         Route::prefix('transcription')->name('transcription.')->group(function () {
             Route::get('render-table', [TranscriptionController::class, 'renderTranscriptionTable'])->name('render.table');
             Route::get('get', [TranscriptionController::class, 'getTranscription'])->name('get');
@@ -224,6 +242,9 @@ Route::prefix('user')->name('user.')->group(function () {
             Route::get('app-to-proof-reading/{id}', [TranscriptionController::class, 'appToProofReading'])->name('app.to.proof.reading');
             Route::post('file-rename', [TranscriptionController::class, 'renameFile'])->name('file.rename');
         });
+
+        Route::get('subscription/checkout/{id}', [PaymentController::class, 'subscription'])->name('subscription.checkout');
+        Route::post('payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
     });
 });
 
@@ -236,13 +257,22 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
         //Protected Route start
         Route::get('dashboard', [ReaderController::class, 'dashboard'])->name('dashboard');
         Route::get('logout', [ReaderController::class, 'logout'])->name('logout');
+
+        Route::get('pdf/download/{transcription}', [TranscriptionController::class, 'transcriptionPDFdownload'])->name('pdf.download');
+        Route::get('docx/download/{transcription}', [TranscriptionController::class, 'transcriptionDOCXdownload'])->name('docx.download');
     });
 
     // Tasks Route
     Route::prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', [TaskController::class, 'list'])->name('list');
         Route::get('claimed-by-proof-reader/{id}', [TaskController::class, 'claimedByProofReader'])->name('claimed.by.proof.reader');
+        Route::get('view/{id}',[TaskController::class,'taskView'])->name('view');
+
+        Route::post('update/{id}', [TaskController::class, 'updateTaskTranscription'])->name('update');
+        Route::get('mark-as-complete/{id}', [TaskController::class, 'markAsComplete'])->name('mark-as-complete');
+
     });
 });
 
 Route::get('audio/download/{filename}', [TranscriptionController::class, 'audioDownload'])->name('audio.download');
+

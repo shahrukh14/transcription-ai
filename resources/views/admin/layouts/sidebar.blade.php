@@ -62,6 +62,21 @@
                     <span class="menu-title text-truncate font-size-12px" data-i18n="dollar-sign">@lang('Transcription')</span>
                 </a>
             </li>
+            {{-- transaction --}}
+            <li class="@if ((request()->is('admin/transaction')) || (request()->is('admin/transaction/list'))|| (request()->is('admin/transaction/detail*'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('admin.transaction.list') }}">
+                    <i class="fa-solid fa-money-check-dollar"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="dollar-sign">@lang('Transaction')</span>
+                </a>
+            </li>
+
+            {{-- proof-Reading --}}
+            <li class="@if (request()->is('admin/proof-reading')) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('admin.proof-reading.list') }}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="Proof Reading">@lang('Proof Reading')</span>
+                </a>
+            </li>
 
             <li class=" nav-item">
                 <a class="d-flex align-items-center" href="#">
@@ -146,6 +161,7 @@
                                 </a>
                             </li>
                             @endcan
+
                         </ul>
                     </li>
                 </ul>

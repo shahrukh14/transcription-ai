@@ -43,7 +43,9 @@
 <!-- BEGIN:Custom Page JS-->
 <script src="{{asset('assets/js/scripts.js')}}"></script>
 <script src="{{asset('assets/js/graph.js')}}"></script>
-<script src="{{asset('assets/js/chart.min.js')}}"></script>  
+<script src="{{asset('assets/js/chart.min.js')}}"></script> 
+<script src="{{asset('app-assets/vendors/js/extensions/plyr.min.js')}}"></script>
+<script src="{{asset('app-assets/vendors/js/extensions/plyr.polyfilled.min.js')}}"></script> 
 
 <!-- END:Custom Page JS-->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -64,11 +66,7 @@
                 height: 14
             });
         }
-		ClassicEditor
-            .create(document.querySelector('#description'))
-            .catch(error => {
-                console.error(error);
-         });
+
 
     })
   </script>
