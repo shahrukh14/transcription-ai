@@ -188,6 +188,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::post('add', [ProofReaderAssessmentsController::class, 'add'])->name('add');
                 Route::get('get/audio/transcription', [ProofReaderAssessmentsController::class, 'getAudioTranscription'])->name('get.audio.transcription');
             });
+
+            Route::prefix('recruitment')->name('recruitment.')->group(function () {
+                Route::get('/', [ProofReaderController::class, 'recruitmentList'])->name('list');
+                Route::get('test/{id}', [ProofReaderController::class, 'recruitmentTest'])->name('test');
+                Route::get('test/approve/{id}', [ProofReaderController::class, 'recruitmentTestApprove'])->name('test.approve');
+                Route::get('test/re-do/{id}', [ProofReaderController::class, 'recruitmentTestReDo'])->name('test.re.do');
+                Route::get('test/reject/{id}', [ProofReaderController::class, 'recruitmentTestReject'])->name('test.reject');
+            });
         });
 
         //Packages
@@ -211,6 +219,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('assign/{id}', [ProofReadingController::class, 'assignProofreader'])->name('assign');
             Route::post('price/update/{id}', [ProofReadingController::class, 'priceUpdate'])->name('price.update');
             Route::post('approve/{id}', [ProofReadingController::class, 'approve'])->name('approve');
+            Route::post('reject/{id}', [ProofReadingController::class, 'reject'])->name('reject');
             Route::get('pdf/download/{transcription}', [ReaderController::class, 'pdfDownload'])->name('pdf.download');
             Route::get('docx/download/{transcription}', [ReaderController::class, 'docxDownload'])->name('docx.download');
         });
@@ -290,13 +299,16 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
     Route::get('email/verification', [ReaderController::class, 'emailVerification'])->name('email.verification');
     Route::get('login', [ReaderController::class, 'login'])->name('login');
     Route::post('login/submit', [ReaderController::class, 'loginSubmit'])->name('login.submit');
-    Route::middleware(['auth:reader'])->group(function () {
+
+    Route::middleware(['auth:reader','check_application_assessment'])->group(function () {
         //Protected Route start
         Route::get('dashboard', [ReaderController::class, 'dashboard'])->name('dashboard');
         Route::get('profile', [ReaderController::class, 'profile'])->name('profile');
         Route::post('profile/update', [ReaderController::class, 'profileUpdate'])->name('profile.update');
         Route::get('logout', [ReaderController::class, 'logout'])->name('logout');
 
+        Route::get('application', [ReaderController::class, 'applicationForm'])->name('application.form');
+        Route::post('application/submit', [ReaderController::class, 'applicationSubmit'])->name('application.submit');
         Route::get('assessment', [ReaderController::class, 'assessment'])->name('assessment');
         Route::get('assessment/test/{id}', [ReaderController::class, 'assessmentTest'])->name('assessment.test');
         Route::post('assessment/test/segment/update/{id}', [ReaderController::class, 'assessmentTestSegmentUpdate'])->name('assessment.test.segment.update');
@@ -304,20 +316,20 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
 
         Route::get('pdf/download/{transcription}', [ReaderController::class, 'pdfDownload'])->name('pdf.download');
         Route::get('docx/download/{transcription}', [ReaderController::class, 'docxDownload'])->name('docx.download');
-    });
 
-    // Tasks Route
-    Route::prefix('tasks')->name('tasks.')->group(function () {
-        Route::get('/', [TaskController::class, 'list'])->name('list');
-        Route::get('/my-task', [TaskController::class, 'myTask'])->name('my.task');
-        Route::get('claimed-by-proof-reader/{id}', [TaskController::class, 'claimedByProofReader'])->name('claimed.by.proof.reader');
-        Route::get('view/{id}',[TaskController::class,'taskView'])->name('view');
-        Route::post('add/segment/{id}', [TaskController::class, 'addSegment'])->name('segment.add');
-        Route::post('update/{id}', [TaskController::class, 'updateTaskTranscription'])->name('update');
-        Route::post('speaker-update/{id}', [TaskController::class, 'updateTranscriptionSpeaker'])->name('speaker.update');
-        Route::post('speaker-rename', [TaskController::class, 'renameTranscriptionSpeaker'])->name('speaker.rename');
-        Route::get('mark-as-complete/{id}', [TaskController::class, 'markAsComplete'])->name('mark-as-complete');
-
+        
+        // Tasks Route
+        Route::prefix('tasks')->name('tasks.')->group(function () {
+            Route::get('/', [TaskController::class, 'list'])->name('list');
+            Route::get('/my-task', [TaskController::class, 'myTask'])->name('my.task');
+            Route::get('claimed-by-proof-reader/{id}', [TaskController::class, 'claimedByProofReader'])->name('claimed.by.proof.reader');
+            Route::get('view/{id}',[TaskController::class,'taskView'])->name('view');
+            Route::post('add/segment/{id}', [TaskController::class, 'addSegment'])->name('segment.add');
+            Route::post('update/{id}', [TaskController::class, 'updateTaskTranscription'])->name('update');
+            Route::post('speaker-update/{id}', [TaskController::class, 'updateTranscriptionSpeaker'])->name('speaker.update');
+            Route::post('speaker-rename', [TaskController::class, 'renameTranscriptionSpeaker'])->name('speaker.rename');
+            Route::get('mark-as-complete/{id}', [TaskController::class, 'markAsComplete'])->name('mark-as-complete');
+        });
     });
 });
 

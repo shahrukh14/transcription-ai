@@ -33,6 +33,7 @@ class GeneralsettingsController extends Controller
             $settings->meta_title                   = $request->input('meta_title');
             $settings->proof_reading_per_minute     = $request->input('proof_reading_per_minute');
             $settings->speaker_marking_per_minute   = $request->input('speaker_marking_per_minute');
+            $settings->proof_reading_time_duration  = $request->input('proof_reading_time_duration');
             $settings->proofreading_language        = json_encode($request->input('proofreading_language'));
 
             $folder_path = public_path('admin/generalSetting/');
@@ -106,6 +107,10 @@ class GeneralsettingsController extends Controller
 
             if ($request->input('speaker_marking_per_minute') !== null) {
                 $settings->speaker_marking_per_minute = $request->input('speaker_marking_per_minute');
+            }
+
+            if ($request->input('proof_reading_time_duration') !== null) {
+                $settings->proof_reading_time_duration = $request->input('proof_reading_time_duration');
             }
 
             if ($request->input('proofreading_language') !== null) {

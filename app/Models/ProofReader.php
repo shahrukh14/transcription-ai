@@ -15,4 +15,8 @@ class ProofReader extends Authenticatable
     public function fullName(){
         return $this->first_name." ".$this->last_name;
     }
+
+    public function tests(){
+        return $this->hasMany(ProofReaderTest::class, 'user_id');
+    }
 }

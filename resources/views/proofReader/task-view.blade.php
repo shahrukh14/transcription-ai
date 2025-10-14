@@ -87,6 +87,13 @@
                         <div class="card">
                             <div class="card-body">
                                 <div>
+                                    <span class="fw-bolder h4 timerRunning">Timer Running</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div>
                                     <span class="fw-bolder h4">Proof Reading Cost : ₹ {{number_format($task->price,2)}}</span>
                                 </div>
                             </div>
@@ -541,4 +548,43 @@ $(document).ready(function () {
 </script>
 @endpush
 
+@if($task->status == 'Claimed' && $task->claimed_dt != null && $task->claimed_by == auth()->guard('reader')->user()->id)
+
+@push('script')
+<script> 
+
+const claimTime = "{{ \Carbon\Carbon::parse($task->claimed_dt)->format('Y-m-d H:i:s') }}";
+const durationMinutes = "{{ $task->proof_reading_time_duration }}"; //In minutes
+const markAsCompleteUrl = "{{ route('proof-reader.tasks.mark-as-complete', ['id' => $task->id]) }}";
+
+$(document).ready(function () {
+    const startTime = new Date(claimTime);
+    const duration = durationMinutes * 60; // convert mins to seconds
+    const endTime = new Date(startTime.getTime() + duration * 1000); // Calculate end time
+
+    // Update timer every second
+    const timerInterval = setInterval(function () {
+        const now = new Date(); // this is client's time
+
+        // Calculate difference in seconds
+        let diff = Math.floor((endTime - now) / 1000);
+
+        if (diff <= 0) {
+            clearInterval(timerInterval);
+            $('.timerRunning').text('00:00:00');
+            window.location.href = markAsCompleteUrl;
+            return;
+        }
+
+        const hours = String(Math.floor(diff / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+        const seconds = String(diff % 60).padStart(2, '0');
+
+        $('.timerRunning').text(`Remaining Time : ${hours}:${minutes}:${seconds}`);
+    }, 1000);
+});
+
+</script>
+@endpush
+@endif
 

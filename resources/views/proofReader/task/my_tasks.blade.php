@@ -36,8 +36,8 @@
                                 <form method="GET" action="">
                                     <select class="form-select" name="status" onchange="this.form.submit()">
                                         <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All</option>
-                                        <option value="claimed" {{ request('status') == 'claimed' ? 'selected' : '' }}>Claimed</option>
-                                        <option value="unclaimed" {{ request('status') == 'unclaimed' ? 'selected' : '' }}>Unclaimed</option>
+                                        <option value="Claimed" {{ request('status') == 'Claimed' ? 'selected' : '' }}>Claimed</option>
+                                        <option value="Unclaimed" {{ request('status') == 'Unclaimed' ? 'selected' : '' }}>Unclaimed</option>
                                     </select>
                                 </form>
                                 {{-- date filter --}}
@@ -56,7 +56,7 @@
                                     @if((request()->is('proof-reader/tasks/my-task')))
                                         <a href="{{ route('proof-reader.tasks.my.task') }}" class="btn btn-primary"><i class="fa-solid fa-rotate-right"></i></a>
                                     @else
-                                        <a href="{{ route('proof-reader.tasks.list') }}" class="btn btn-primary"><i class="fa-solid fa-rotate-right"></i></a>
+                                        <a href="{{ route('proof-reader.tasks.my.task') }}" class="btn btn-primary"><i class="fa-solid fa-rotate-right"></i></a>
                                     @endif
                                 </form>
                             </div>
@@ -65,10 +65,11 @@
                                     <thead>
                                         <tr>
                                             <th>@lang('Audio')</th>
-                                            <th>@lang('Uploaded At')</th>
+                                            <th>@lang('Status')</th>
                                             <th>@lang('Claimed At')</th>
+                                            <th>@lang('Unclaimed At')</th>
                                             <th>@lang('Completed At')</th>
-                                            <th>@lang('Claim Tasks')</th>
+                                            <th>@lang('Action')</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -76,18 +77,29 @@
                                         @foreach ($tasks as $index => $task)
                                         <tr>
                                             <td>
-                                                <a href="{{ route('proof-reader.tasks.view',$task->id) }}" title="{{$task->transcription->audio_file_original_name}}">
-                                                    {{ Str::limit($task->transcription->audio_file_original_name, 30, '...') }}
+                                                <a href="{{ route('proof-reader.tasks.view',$task->task_id) }}" title="{{$task->task->transcription->audio_file_original_name}}">
+                                                    {{ Str::limit($task->task->transcription->audio_file_original_name, 30, '...') }}
                                                 </a>
                                             </td>
-                                            <td>{{date('d M Y, h:i A', strtotime($task->uploaded_dt))}}</td>
-                                            <td>{!! ($task->claimed_dt != null) ? date('d M Y, h:i A', strtotime($task->claimed_dt)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Claimed</span>' !!}</td>
-                                            <td>{!! ($task->task_complete_time != null) ? date('d M Y, h:i A', strtotime($task->task_complete_time)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Completed</span>' !!}</td>
+                                            <td>
+                                                @if ($task->status == "Completed")
+                                                    <span class="badge rounded-pill badge-light-success me-1">Completed</span>
+                                                @elseif ($task->status == "Claimed")
+                                                    <span class="badge rounded-pill badge-light-primary me-1">Claimed</span>
+                                                @elseif ($task->status == "Unclaimed")
+                                                    <span class="badge rounded-pill badge-light-danger me-1">Unclaimed</span>
+                                                @else
+                                                    <span class="badge rounded-pill badge-light-warning me-1">Pending</span>
+                                                @endif
+                                            </td>
+                                            <td>{!! ($task->claim_date != null) ? date('d M Y, h:i A', strtotime($task->claim_date)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Claimed</span>' !!}</td>
+                                            <td>{!! ($task->unclaim_date != null) ? date('d M Y, h:i A', strtotime($task->unclaim_date)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Unclaimed</span>' !!}</td>
+                                            <td>{!! ($task->completed_date != null) ? date('d M Y, h:i A', strtotime($task->completed_date)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Completed</span>' !!}</td>
                                             <td>
                                                 @if ($task->status == "Completed")
                                                     <span class="badge rounded-pill badge-light-success me-1">Completed</span>
                                                 @else
-                                                    <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->id]) }}">
+                                                    <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->task_id]) }}">
                                                         <select name="status" id="" onchange="this.form.submit()" class="form-control">
                                                             <option value="">Select</option>
                                                             <option value="Claimed" {{ $task->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>

@@ -31,12 +31,14 @@
                 </a>
             </li>
             @else
-            <li class="@if ((request()->is('proof-reader/assessment'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('proof-reader.assessment') }}">
-                    <i data-feather="home"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Assessment">@lang('Assessment')</span>
-                </a>
-            </li>
+                @if(auth()->guard('reader')->user()->application_form_submit)
+                    <li class="@if ((request()->is('proof-reader/assessment'))) active @endif nav-item">
+                        <a class="d-flex align-items-center" href="{{ route('proof-reader.assessment') }}">
+                            <i data-feather="home"></i>
+                            <span class="menu-title text-truncate font-size-12px" data-i18n="Assessment">@lang('Assessment')</span>
+                        </a>
+                    </li>
+                @endif
             @endif
         </ul>
     </div>

@@ -157,6 +157,11 @@
                             @endif
                         </div>
                     </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <button class="btn btn-outline-danger w-100 rejectBtn">Reject</button>
+                        </div>
+                    </div>
                 </div>
             </div>   
         </div>
@@ -178,6 +183,38 @@
 <!--/ AUDIO Player -->
 <!-- END: Content-->
 @endsection
+
+@push('modal')
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form action="{{ route('admin.proof-reading.reject', ['id' => $task->id]) }}" method="POST">
+            @csrf
+                <div class="modal-header">
+                    <h4 class="modal-title" id="rejectModalLabel"> <i class="fa-solid fa-ban"></i> Reject Proof Reading</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-1">
+                            <label for="reject_reason" class="form-label">Reason</label>
+                            <textarea class="form-control" name="reject_reason" id="reject_reason" rows="3" placeholder="enter reason of rejecction"></textarea>
+                        </div>
+                        <div class="col-md-12 mb-1">
+                            <label for="proof_reading_time_duration" class="form-label">Proof Reading time duration (in minute)</label>
+                            <input type="number" class="form-control" name="proof_reading_time_duration" id="proof_reading_time_duration" value="{{ $task->proof_reading_time_duration }}" placeholder="enter proof reading time duration in seconds" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                   <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endpush
+
 @push('style')
 <style>
     .segment{
@@ -286,6 +323,10 @@ $(document).ready(function () {
     audio.addEventListener('timeupdate', function () {
         let currentTime = audio.currentTime;
         highlightSegmentByTime(currentTime);
+    });
+
+    $('.rejectBtn').on('click', function(){
+       $('#rejectModal').modal('show');
     });
 
 });

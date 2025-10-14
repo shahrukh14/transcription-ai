@@ -57,13 +57,9 @@
                         <div class="card">
                             <div class="card-header"></div><hr>
                             <div class="card-body pt-0">
-                                <form action="{{ route('proof-reader.assessment.test.final.submit', $test->id) }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('proof-reader.assessment.test.final.submit', $test->id) }}" method="POST" id="finalSubmitForm">
                                     @csrf
                                     <div class="row">
-                                        <div class="col-md-12 mt-1">
-                                            <label for="attachments" class="form-label">Attachment</label>
-                                            <input type="file" class="form-control" name="attachments" id="attachments" accept=".pdf, .docx">
-                                        </div>
                                         <div class="col-md-12 mt-1">
                                             <button type="submit" class="btn btn-outline-success w-100">Final Sumbit</button>
                                         </div>
@@ -81,9 +77,9 @@
         <div class="card" id="sticky-audio-player">
             <div class="card-body d-flex justify-content-center align-items-center">
                 <div style="width: 53%; margin-left:8%;">
-                    <h6 class="card-title text-center mb-0">{{ $test->audio_file }}</h6>
+                    <h6 class="card-title text-center mb-0">{{ $test->assessment->audio_file }}</h6>
                     <audio id="plyr-audio-player" class="audio-player w-100" controls>
-                        <source src="{{ asset('admin/assessments/audios/' . $test->audio_file) }}" type="audio/mp3" />
+                        <source src="{{ asset('admin/assessments/audios/' . $test->assessment->audio_file) }}" type="audio/mp3" />
                     </audio>
                 </div>
             </div>
@@ -170,9 +166,7 @@ $(document).ready(function () {
         if (diff <= 0) {
             clearInterval(timerInterval);
             $('.timerRunning').text('00:00:00');
-            alert("Time is up! Submitting the test.");
-            // Optionally submit form here
-            // $('#examForm').submit();
+            $('#finalSubmitForm').submit();
             return;
         }
 

@@ -4,8 +4,9 @@ namespace App\Http\Controllers\ProofReader;
 
 use Exception;
 use App\Models\Task;
-use Illuminate\Http\Request;
 use App\Models\Transcription;
+use Illuminate\Http\Request;
+use App\Models\TaskClaimRecord;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
@@ -14,9 +15,8 @@ use App\Http\Controllers\Controller;
 
 class TaskController extends Controller
 {
-    public function list(Request $request)
-    {
-        $query = Task::with('transcription');
+    public function list(Request $request){
+        $query = Task::where('claimed_by' , NULL)->with('transcription');
 
         // Search filter
         $search = $request->search ?? '';
@@ -44,37 +44,59 @@ class TaskController extends Controller
     }
 
     public function myTask(Request $request){
-        $query = Task::with('transcription')->where('claimed_by', auth()->guard('reader')->user()->id);
+        $query = TaskClaimRecord::where('proof_reader_id', auth()->guard('reader')->user()->id);
 
         // Date filtering
         $from = $request->from ? date('Y-m-d', strtotime($request->from)) : null;
         $to = $request->to ? date('Y-m-d', strtotime($request->to)) : null;
 
         if ($from && $to && $from <= $to) {
-            $query->whereBetween('uploaded_dt', [$from, $to]);
+            $query->whereBetween('claim_date', [$from, $to]);
         }
+
         // Search filtering
         $search = $request->search;
-        if (!empty($search)) {
-            $searchTerms = explode(' ', $search);
-            $query->whereHas('transcription', function($q) use ($searchTerms) {
-                foreach ($searchTerms as $term) {
-                    $q->where('audio_file_original_name', 'LIKE', '%' . $term . '%');
-                }
-            });
+        $status = $request->status ?? 'all';
+        if ($status == 'Claimed' || $status == 'Unclaimed') {
+            $query->where('status', $status);
         }
+
         $tasks = $query->orderBy('created_at', 'DESC')->paginate(10);
-        return view('proofReader.task.list', compact('tasks', 'search', 'from', 'to'));
+        return view('proofReader.task.my_tasks', compact('tasks', 'search', 'from', 'to'));
     }
 
     public function claimedByProofReader(Request $request, $id)
     {
         try {
-            $updateTask = Task::where('id', $id)->update([
-                'claimed_by' => Auth::guard('reader')->user()->id,
-                'claimed_dt' => Date::now(),
-                'status' => $request->status,
-            ]);
+            $task = Task::findOrFail($id);
+            if($request->status == 'Claimed'){
+                $task->claimed_by = Auth::guard('reader')->user()->id;
+                $task->claimed_dt = Date::now();
+            }else{
+                $task->claimed_by = NULL;
+                $task->claimed_dt = NULL;
+            }
+            $task->status = $request->status;
+            $task->save();
+
+            //Store task claim records
+            $taskClaimRecord                    = new TaskClaimRecord();
+            $taskClaimRecord->proof_reader_id   = auth()->guard('reader')->user()->id;
+            $taskClaimRecord->task_id           = $id;
+            $taskClaimRecord->claim_date        = Date::now();
+            $taskClaimRecord->status            = $request->status;
+
+            if($request->status == 'Claimed'){
+                $taskClaimRecord->claim_date = Date::now();
+                $taskClaimRecord->remark = "Task claimed by ".auth()->guard('reader')->user()->fullName();
+            }
+
+            if($request->status == 'Unclaimed'){
+                $taskClaimRecord->unclaim_date = Date::now();
+                $taskClaimRecord->remark = "Task unclaimed by ".auth()->guard('reader')->user()->fullName();
+            }
+            $taskClaimRecord->save();
+           
             alert()->success('success', 'You ' . $request->status . ' the task!');
             return redirect()->back();
         } catch (\Exception $ex) {
@@ -194,6 +216,15 @@ class TaskController extends Controller
         $task->status             = "Completed";
         $task->task_complete_time = Date::now();
         $task->save();
+
+        //Store task claim records
+        $taskClaimRecord                    = new TaskClaimRecord();
+        $taskClaimRecord->proof_reader_id   = auth()->guard('reader')->user()->id;
+        $taskClaimRecord->task_id           = $id;
+        $taskClaimRecord->completed_date    = Date::now();
+        $taskClaimRecord->status            = "Completed";
+        $taskClaimRecord->save();
+
         alert()->success('Success', 'Proof Reading Submitted');
         return redirect()->back();
     }

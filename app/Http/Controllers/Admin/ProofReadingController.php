@@ -8,6 +8,7 @@ use App\Models\Wallet;
 use App\Models\ProofReader;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Models\TaskClaimRecord;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
@@ -118,6 +119,29 @@ class ProofReadingController extends Controller
             return redirect()->back();
         }
     }
+
+    public function reject(Request $request, $id){
+        $task = Task::find($id);
+       
+        //Store task claim records
+        $taskClaimRecord                    = new TaskClaimRecord();
+        $taskClaimRecord->proof_reader_id   = $task->claimed_by;
+        $taskClaimRecord->task_id           = $id;
+        $taskClaimRecord->status            = "Rejected";
+        $taskClaimRecord->remark            = $request->reject_reason;
+        $taskClaimRecord->save();
+
+        //Update tasks
+        $task->claimed_by                   = NULL;
+        $task->claimed_dt                   = NULL;
+        $task->status                       = "Rejected";
+        $task->proof_reading_time_duration  = $request->proof_reading_time_duration;
+        $task->save();
+
+        alert()->success('success', 'Proof Reading Rejected');
+        return redirect()->back();
+    }
+
 
     public function pdfDownload(Request $request, $id){
         $task = Task::find($id); 

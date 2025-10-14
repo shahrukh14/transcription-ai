@@ -48,6 +48,7 @@
                                             <tr>
                                                 <th class="text-nowrap">@lang('Name')</th>
                                                 <th class="text-nowrap">@lang('Audio')</th>
+                                                <th class="text-nowrap">@lang('Type')</th>
                                                 <th class="text-nowrap">@lang('Language')</th>
                                                 <th class="text-nowrap">@lang('Audio Duration')</th>
                                                 <th class="text-nowrap">@lang('Test Duration')</th>
@@ -101,6 +102,13 @@
                                 @foreach ($languages as $language)
                                     <option value="{{$language}}">{{Illuminate\Support\Str::ucfirst($language)}}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label class="form-label" for="assessment_type">Audio for which assessment</label><span class="text-danger">*</span>
+                            <select class="form-select languageSelect" id="assessment_type" name="assessment_type" required>
+                                <option value="1">Assessment 1</option>
+                                <option value="2">Assessment 2</option>
                             </select>
                         </div>
                     </div>

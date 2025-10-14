@@ -318,7 +318,7 @@ $(document).ready(function () {
             url: uploadUrl, // Use the dynamic URL
             paramName: "audio", // Name of the file in request
             maxFiles: 1,
-            maxFilesize: 1024, // Max file size = 1 GB
+            maxFilesize: 5120, // Max file size = 5 GB
             acceptedFiles: ".mp3,.wav,.flac,.aac,.opus,.ogg,.m4a,.mp4,.mpeg,.mov,.webm",
             addRemoveLinks: true,
             autoProcessQueue: false, // Prevent automatic upload

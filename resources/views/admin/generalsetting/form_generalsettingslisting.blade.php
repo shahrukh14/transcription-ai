@@ -134,6 +134,11 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-4">
+                                <label for="proof_reading_time_duration" class="form-label">@lang('Proof Reading time duration (in mins) for 1 min of audio ')</label>
+                                <input type="number" class="form-control" name="proof_reading_time_duration" id="proof_reading_time_duration" step="any" placeholder="@lang('in minutes')" value="{{ $existingSettings ? $existingSettings->proof_reading_time_duration : 0 }}">
+                                <span class="text-danger" id="proof_reading_time_duration-error"></span>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">@lang('Save Settings')</button>
                     </form>

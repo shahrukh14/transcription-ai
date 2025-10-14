@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 
 
-
 class ProofReaderAssessmentsController extends Controller
 {
     public function list(){
@@ -108,6 +107,7 @@ class ProofReaderAssessmentsController extends Controller
                 $assessmentTest->audio_duration             = $duration;
                 $assessmentTest->audio_language             = $request->audio_language;
                 $assessmentTest->audio_file_original_name   = $cleanedName;
+                $assessmentTest->assessment_type            = $request->assessment_type;
                 $assessmentTest->save();
             }else{
                 alert()->error('Audio Requied', 'Please select an audio file before submiting');

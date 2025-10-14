@@ -34,6 +34,13 @@
         <tr>
             <td>{{$test->name}}</td>
             <td>{{ Str::limit($test->audio_file_original_name, 50, '...') }}</td>
+            <td>
+                @if ($test->assessment_type == 1)
+                    <span class="badge rounded-pill badge-light-primary me-1">Assessment 1</span>
+                @else
+                    <span class="badge rounded-pill badge-light-info me-1">Assessment 2</span>
+                @endif
+            </td>
             <td>{{ ucfirst($test->audio_language) }}</td>
             <td>{{ $audioDuration }}</td>
             <td>{{ $testDuration }}</td>

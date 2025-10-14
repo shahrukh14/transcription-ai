@@ -167,7 +167,7 @@
     <!-- BEGIN: Page JS-->
     <script src="{{asset('app-assets/js/scripts/pages/auth-login.js')}}"></script>
     <!-- END: Page JS-->
-
+    @include('sweetalert::alert')
     <script>
         $(window).on('load', function() {
             if (feather) {

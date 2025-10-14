@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Exception;
 use App\Models\Task;
 use App\Models\ProofReader;
@@ -139,21 +140,32 @@ class ReaderController extends Controller
 
     public function loginSubmit(Request $request){
         if (Auth::guard('reader')->attempt(['email' => $request->email, 'password' => $request->password])) {
-            if(auth()->guard('reader')->user()->email_verified){
-                if(auth()->guard('reader')->user()->status){
-                    return redirect()->route('proof-reader.dashboard');
-                }else{
-                    return redirect()->route('proof-reader.assessment');
-                }
-            }else{
-                Auth::guard('reader')->logout();
-                alert()->error('Verification Required', 'Your email is not verified yet. Click on the link you get in email');
-                return redirect()->back();
-            }
+            return redirect()->route('proof-reader.dashboard');
         } else {
             alert()->error('Error', 'Incorrect Credentials');
             return redirect()->back();
         }
+    }
+
+    public function applicationForm(){
+        $languages = DB::table('languages')->orderBy('name','ASC')->pluck('name')->toArray();
+        return view('proofReader.application_form', compact('languages'));
+    }
+
+    public function applicationSubmit(Request $request){
+        $proofreader = auth()->guard('reader')->user();
+        $proofreader->language_known            = json_encode($request->language_known);
+        $proofreader->whatsapp_number           = $request->whatsapp_number;
+        $proofreader->typing_speed              = $request->typing_speed;
+        $proofreader->work_hours                = $request->work_hours;
+        $proofreader->city                      = $request->city;
+        $proofreader->state                     = $request->state;
+        $proofreader->work_experience           = $request->work_experience;
+        $proofreader->paragraph                 = $request->paragraph;
+        $proofreader->application_form_submit   = 1;
+        $proofreader->save();
+        alert()->success('Success', 'Deatils Submitted');
+        return redirect()->route('proof-reader.assessment');
     }
 
     public function logout(){
@@ -240,7 +252,11 @@ class ReaderController extends Controller
 
 
     public function assessment(){
-        $tests = AssessmentTest::get();
+        if(auth()->guard('reader')->user()->assessment_1_complete == 0){ //for first assessment
+            $tests = AssessmentTest::where('assessment_type', 1)->get();
+        }else{
+            $tests = AssessmentTest::where('assessment_type', 2)->get();
+        }
         return view('proofReader.assessment', compact('tests')); 
     }
 
@@ -291,20 +307,13 @@ class ReaderController extends Controller
     public function assessmentTestFinalSubmit(Request $request, $id){
         try{
             $proofReaderTest = ProofReaderTest::find($id);
-            if ($request->hasFile('attachments')) {
-                $folder_path = public_path('admin/assessments/test/documents');
-                if (!File::exists($folder_path)) {
-                    File::makeDirectory($folder_path, 0777, true, true);
-                }
-                $filename = 'Document'. '_' . rand() . '.' . $request->attachments->getClientOriginalExtension();
-                $request->attachments->move($folder_path, $filename);
-            }else{
-                $filename = null;
-            }
             $proofReaderTest->submit_time = \Carbon\Carbon::now();
-            $proofReaderTest->attachments = $filename;
             $proofReaderTest->save();
-       
+
+            $proofreader = auth()->guard('reader')->user();
+            $proofreader->assessment_1_complete   = 1;
+            $proofreader->save();
+            
             alert()->success('Success', 'Test Submitted successfully');
             return redirect()->route('proof-reader.assessment');
         } catch (\Exception $exception){

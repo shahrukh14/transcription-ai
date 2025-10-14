@@ -51,6 +51,13 @@
                 </a>
             </li>
 
+            <li class="@if ((request()->is('admin/proof-reader/recruitment'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.recruitment.list') }}">
+                    <i class="fa-brands fa-hire-a-helper"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="Recruitment">@lang('Recruitment')</span>
+                </a>
+            </li>
+
             <li class="@if ((request()->is('admin/package')) || (request()->is('admin/package/add')) || (request()->is('admin/package/edit'))) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('admin.package.list') }}">
                     <i class="fa-solid fa-cubes"></i>
