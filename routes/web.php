@@ -230,6 +230,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::get('pricing', [HomeController::class, 'pricing'])->name('pricing');
 Route::get('faqs', [HomeController::class, 'faqs'])->name('faqs');
+Route::get('why-proof-reading', [HomeController::class, 'whyProofReading'])->name('why.proof.reading');
 Route::get('blog', [HomeController::class, 'blog'])->name('blog');
 Route::get('contact', [HomeController::class, 'contact'])->name('contact');
 Route::post('contact-store', [HomeController::class, 'contactstore'])->name('contact.store');
@@ -329,6 +330,7 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
             Route::post('speaker-update/{id}', [TaskController::class, 'updateTranscriptionSpeaker'])->name('speaker.update');
             Route::post('speaker-rename', [TaskController::class, 'renameTranscriptionSpeaker'])->name('speaker.rename');
             Route::get('mark-as-complete/{id}', [TaskController::class, 'markAsComplete'])->name('mark-as-complete');
+             Route::get('transcription-get/{id}', [TaskController::class, 'getTranscription'])->name('transcription.get');
         });
     });
 });

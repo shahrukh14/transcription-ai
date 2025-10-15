@@ -14,12 +14,12 @@
             @endif
             <div class="content-body">
                 <div class="row">
-                    <div class="col-xl-9 col-md-9 col-6">
+                    <div @if($task->status != null && $task->claimed_by == auth()->guard('reader')->user()->id) class="col-xl-9 col-md-9 col-6" @else class="col-xl-12 col-md-12 col-6" @endif>
                         <div class="card w-100 mb-4">
                             <div class="card-header d-flex justify-content-between pb-0">
                                 <h4 class="card-title">
                                     <i class="fa-regular fa-file-audio" style="font-size:25px;"></i> 
-                                    {{ $task->transcription->audio_file_original_name }}
+                                    {{ $task->audio_name }}
                                 </h4>
                                 <h6 class="card-title">
                                     @if ($task->status == "Completed")
@@ -38,52 +38,63 @@
                             <div class="card-body pt-0">
                                 <div class="row">
                                     <p class="fw-bolder">{{date('d M Y, h:i A', strtotime($task->created_at))}}</p>
-                                    <div class="form-floating col-md-12">
-                                        @php 
-                                            $transcription_segments = $task->transcription_segments;
-                                        @endphp
-                                        @foreach (json_decode($transcription_segments)??[] as $segment)
-                                            @php
-                                                $timeInSeconds  = $segment->start;
-                                                $minutes        = floor($timeInSeconds / 60);
-                                                $seconds        = $timeInSeconds - ($minutes * 60);
-                                                $roundedSeconds = round($seconds);
-                                                $formattedTime  = sprintf("%02d:%02d", $minutes, $roundedSeconds);
-                                            @endphp
-                                            <div class="pt-1">
-                                                <div class="d-flex justify-content-start gap-1">
-                                                    <div class="dropdown speaker">
-                                                        <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0 fw-bolder speakerNameText" data-bs-toggle="dropdown">
-                                                            {{ $allSpeakers[$segment->speaker] }}
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-right">
-                                                            @foreach ($allSpeakers as $speakrValue => $speakerName)
-                                                                <a class="dropdown-item speakerDropdown" href="#" data-speaker="{{ $speakrValue }}" data-id="{{ $segment->id }}">
-                                                                    <span>{{ $speakerName }}</span>
-                                                                </a>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                    <span class="playAudio" data-start="{{ $segment->start }}" data-end="{{ $segment->end }}">
-                                                        <i class="fa-solid fa-volume-high"></i>
-                                                    </span>
-                                                    <span class="addSegment" data-id="{{ $segment->id }}" data-language="{{ $segment->language }}">
-                                                        <i class="fa-solid fa-square-plus" style="cursor: pointer;"></i>
-                                                    </span>
-                                                </div>
-                                                <p class="@if($task->status != 'Completed') segment @endif segment-style" data-start="{{ $segment->start }}" data-end="{{ $segment->end }}" data-id="{{ $segment->id }}" data-speaker="{{ $segment->speaker }}">
-                                                    <span style="color: #717272" class="time-stamp">({{ $formattedTime }})</span>
-                                                    <span class="editable-text">{{ $segment->text }}</span>
-                                                    <input type="text" class="form-control edit-input d-none" value="{{$segment->text}}">
-                                                </p>
+                                    @if($task->transcripted == 0)
+                                        <div class="form-floating col-md-12 text-center">
+                                            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem" role="status">
+                                                <span class="visually-hidden">Loading...</span>
                                             </div>
-                                        @endforeach
-                                    </div>
+                                            <p>Loading Transcription</p>
+                                        </div>
+                                    @else
+                                        <div class="form-floating col-md-12">
+                                            @php 
+                                                $transcription_segments = $task->transcription_segments;
+                                            @endphp
+                                            @foreach (json_decode($transcription_segments)??[] as $segment)
+                                                @php
+                                                    $timeInSeconds  = $segment->start;
+                                                    $minutes        = floor($timeInSeconds / 60);
+                                                    $seconds        = $timeInSeconds - ($minutes * 60);
+                                                    $roundedSeconds = round($seconds);
+                                                    $formattedTime  = sprintf("%02d:%02d", $minutes, $roundedSeconds);
+                                                @endphp
+                                                <div class="pt-1">
+                                                    <div class="d-flex justify-content-start gap-1">
+                                                        <div class="dropdown speaker">
+                                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0 fw-bolder speakerNameText" data-bs-toggle="dropdown">
+                                                                {{ $allSpeakers[$segment->speaker] }}
+                                                            </button>
+                                                            <div class="dropdown-menu dropdown-menu-right">
+                                                                @foreach ($allSpeakers as $speakrValue => $speakerName)
+                                                                    <a class="dropdown-item speakerDropdown" href="#" data-speaker="{{ $speakrValue }}" data-id="{{ $segment->id }}">
+                                                                        <span>{{ $speakerName }}</span>
+                                                                    </a>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                        <span class="playAudio" data-start="{{ $segment->start }}" data-end="{{ $segment->end }}">
+                                                            <i class="fa-solid fa-volume-high"></i>
+                                                        </span>
+                                                        <span class="addSegment" data-id="{{ $segment->id }}" data-language="{{ $segment->language }}">
+                                                            <i class="fa-solid fa-square-plus" style="cursor: pointer;"></i>
+                                                        </span>
+                                                    </div>
+                                                    <p class="@if($task->status != 'Completed') segment @endif segment-style" data-start="{{ $segment->start }}" data-end="{{ $segment->end }}" data-id="{{ $segment->id }}" data-speaker="{{ $segment->speaker }}">
+                                                        <span style="color: #717272" class="time-stamp">({{ $formattedTime }})</span>
+                                                        <span class="editable-text">{{ $segment->text }}</span>
+                                                        <input type="text" class="form-control edit-input d-none" value="{{$segment->text}}">
+                                                    </p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @if($task->status != null && $task->claimed_by == auth()->guard('reader')->user()->id) 
                     <div class="col-xl-3 col-md-3 col-3">
+                        @if ($task->status == "Claimed")
                         <div class="card">
                             <div class="card-body">
                                 <div>
@@ -91,6 +102,8 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
+                        
                         <div class="card">
                             <div class="card-body">
                                 <div>
@@ -113,7 +126,7 @@
                                         </a>
                                     </li>
                                     <li class="list-group-item">
-                                        <a href="{{ asset('user/audios/' . $task->transcription->audio_file_name) }}" title="Download Audio File"  download="{{$task->transcription->audio_file_original_name}}">
+                                        <a href="{{ asset('user/audios/' . $task->audio_name) }}" title="Download Audio File"  download="{{$task->audio_file_name}}">
                                             <i class="fa-solid fa-cloud-arrow-down"></i> Download Audio
                                         </a>
                                     </li>
@@ -160,6 +173,7 @@
                             <a href="{{ route('proof-reader.tasks.mark-as-complete', ['id' => $task->id]) }}"  class="btn btn-success w-100"> Mark as complete </a>
                         @endif
                     </div>
+                    @endif
                 </div>   
             </div>
         </div>
@@ -169,9 +183,9 @@
         <div class="card" id="sticky-audio-player">
             <div class="card-body d-flex justify-content-center align-items-center">
                 <div style="width: 53%; margin-left:8%;">
-                    <h6 class="card-title text-center mb-0">{{ $task->transcription->audio_file_original_name }}</h6>
+                    <h6 class="card-title text-center mb-0">{{ $task->audio_name }}</h6>
                     <audio id="plyr-audio-player" class="audio-player w-100" controls>
-                        <source src="{{ asset('user/audios/' . $task->transcription->audio_file_name) }}" type="audio/mp3" />
+                        <source src="{{ asset('user/audios/' . $task->audio_file_name) }}" type="audio/mp3" />
                     </audio>
                 </div>
             </div>
@@ -584,6 +598,25 @@ $(document).ready(function () {
     }, 1000);
 });
 
+</script>
+@endpush
+@endif
+
+{{-- Get transcription for this audio --}}
+@if($task->transcripted == 0)
+@push('script')
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: "{{ route('proof-reader.tasks.transcription.get', $task->id) }}",
+            type: "GET",
+            success: function (response) {
+                if(response.success){
+                    location.reload();
+                }
+            }
+        });
+    });
 </script>
 @endpush
 @endif

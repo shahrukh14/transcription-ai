@@ -63,8 +63,8 @@
                                                 @foreach($tasks as $task)
                                                     <tr>
                                                         <td>
-                                                            <a href="{{ route('admin.proof-reading.view',$task->id) }}" title="{{$task->transcription->audio_file_original_name}}">
-                                                                {{ Str::limit($task->transcription->audio_file_original_name, 50, '...') }}
+                                                            <a href="{{ route('admin.proof-reading.view',$task->id) }}" title="{{$task->audio_name}}">
+                                                                {{ Str::limit($task->audio_name, 50, '...') }}
                                                             </a>
                                                         </td>
                                                         <td>{{date('d M Y, h:i A', strtotime($task->uploaded_dt))}}</td>

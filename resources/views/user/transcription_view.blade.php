@@ -239,7 +239,7 @@
 
                         @if(auth()->user()->balance > $finalAmount) {{-- Check availbale balance --}}
                             <div class="row">
-                                <input type="hidden" name="price" id="price" value="{{ $charge }}">
+                                <input type="hidden" name="price" id="price" value="{{$charge}}">
                                 <div class="col-md-12 mb-1">
                                     <label for="instruction" class="form-label">Instructions</label>
                                     <textarea class="form-control" name="instruction" id="instruction" rows="5" placeholder="if you have specific instructions for your proof reading enter here"></textarea>

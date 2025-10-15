@@ -19,14 +19,14 @@ class ProofReadingController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Task::with('getProofreader');
+        $query  = Task::with('getProofreader');
         $search = $request->input('search');
-        if ($request->has('search')) {
+        if ($request->has('search')){
             $query->where('id', 'LIKE', "%$search%");
         }
         if ($request->from && $request->to && $request->from <= $request->to) {
-            $from = date('Y-m-d', strtotime($request->from));
-            $to = date('Y-m-d', strtotime($request->to));
+            $from   = date('Y-m-d', strtotime($request->from));
+            $to     = date('Y-m-d', strtotime($request->to));
             $query->whereDate('uploaded_dt', '>=', $from)->whereDate('uploaded_dt', '<=', $to);
         }
         $query->orderBy('id', 'DESC');

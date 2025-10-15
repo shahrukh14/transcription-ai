@@ -31,6 +31,119 @@
 @endif
 
 <div class="content-body">
+    <section id="introduction-section">
+        <div class="text-center">
+            <h1 class="mt-5 mb-2">Precision Proofreading: Elevating AI Transcripts to Excellence</h1>
+            <p class="mb-1 mx-4">Welcome to Hybrid Intelligence your premier destination for transforming AI-generated transcripts into polished, professional documents. In the era of artificial intelligence, we understand the importance of human touch in refining automated content.</p>
+            <p class="mb-2 pb-75">Trust us to refine your transcripts, so they resonate effectively with your audience.</p>
+            <div class="d-flex align-items-center justify-content-center mb-5 pb-50">
+               <a href="{{ route('login')}}" class="btn btn-outline-primary">Start Your Proofreading Journey</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="knowledge-base-content">
+        <div class="text-center">
+            <h1 class="mt-5 mb-2">Services</h1>
+        </div>
+         <div class="row kb-search-content-info match-height mx-4">
+            <div class="col-md-4 col-sm-6 col-12 kb-search-content">
+                <div class="card">
+                    <a href="page-kb-category.html">
+                        <img src="{{asset('/app-assets/images/illustration/personalization.svg')}}" class="card-img-top" alt="knowledge-base-image" />
+                        <div class="card-body text-center">
+                            <h4>AI Transcript</h4>
+                            <p class="text-body mt-1 mb-0">
+                                Generate your transcript from an AI, we support 80 languages.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 col-12 kb-search-content">
+                <div class="card">
+                    <a href="page-kb-category.html">
+                        <img src="{{asset('/app-assets/images/illustration/demand.svg')}}" class="card-img-top" alt="knowledge-base-image" />
+                        <div class="card-body text-center">
+                            <h4>AI Transcript Proofreading</h4>
+                            <p class="text-body mt-1 mb-0"> We meticulously review your AI-generated transcripts for grammar, punctuation, spelling, and clarity, ensuring a final product that communicates your intended message effectively.</p>
+                            <p class="text-body mt-1 mb-0"> We provide consistency checks across your transcripts, applying uniform style and voice to maintain a professional tone throughout.</p>
+                            <p class="text-body mt-1 mb-0"> Tailoring your transcripts to meet specific formatting guidelines or style preferences, ensuring that your content is not just correct but also visually appealing.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 col-12 kb-search-content">
+                <div class="card">
+                    <a href="page-kb-category.html">
+                        <img src="{{asset('/app-assets/images/illustration/email.svg')}}" class="card-img-top" alt="knowledge-base-image" />
+                        <div class="card-body text-center">
+                            <h4>Manual Transcription</h4>
+                            <p class="text-body mt-1 mb-0">Team of transcribers who can do manual transcription directly from an audio</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="knowledge-base-content">
+        <div class="text-center">
+            <h1 class="mt-5 mb-2">Why Choose Us?</h1>
+        </div>
+         <div class="row kb-search-content-info match-height mx-4">
+            <div class="col-md-3 col-sm-6 col-12 kb-search-content">
+                <div class="card">
+                    <a href="page-kb-category.html">
+                        <img src="{{asset('/app-assets/images/illustration/marketing.svg')}}" class="card-img-top" alt="knowledge-base-image" />
+                        <div class="card-body text-center">
+                            <h4>Experienced Professionals</h4>
+                            <p class="text-body mt-1 mb-0">Our proofreaders have years of experience in linguistics and editing, ensuring your transcripts are handled with expertise.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-12 kb-search-content">
+                <div class="card">
+                    <a href="page-kb-category.html">
+                        <img src="{{asset('/app-assets/images/illustration/demand.svg')}}" class="card-img-top" alt="knowledge-base-image" />
+                        <div class="card-body text-center">
+                            <h4>Quick Turnaround</h4>
+                            <p class="text-body mt-1 mb-0">Need it fast? We offer expedited services to meet tight deadlines without sacrificing quality.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-12 kb-search-content">
+                <div class="card">
+                    <a href="page-kb-category.html">
+                        <img src="{{asset('/app-assets/images/illustration/api.svg')}}" class="card-img-top" alt="knowledge-base-image" />
+                        <div class="card-body text-center">
+                            <h4>100% Confidentiality</h4>
+                            <p class="text-body mt-1 mb-0">Your content is safe with us. We adhere to strict privacy standards to keep your information secure.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-12 kb-search-content">
+                <div class="card">
+                    <a href="page-kb-category.html">
+                        <img src="{{asset('/app-assets/images/illustration/email.svg')}}" class="card-img-top" alt="knowledge-base-image" />
+                        <div class="card-body text-center">
+                            <h4>Affordable Pricing</h4>
+                            <p class="text-body mt-1 mb-0">Quality proofreading shouldn’t be expensive. We offer competitive rates to accommodate all clients</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="pricing-plan">
         <!-- title text and switch button -->
         <div class="text-center">

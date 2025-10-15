@@ -33,9 +33,14 @@ class HomeController extends Controller
 
     public function faqs()
     {
-        $faqs= Faq::all();
+        $faqs= Faq::get();
         return view('user.faqs',compact('faqs'));
     }
+
+    public function whyProofReading(){
+        return view('user.why_proof_reading');
+    }
+
     public function blog()
     {
         $blogs = Blog::orderBy('created_at', 'desc')->paginate(6);

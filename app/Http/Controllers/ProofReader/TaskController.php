@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 
 
 class TaskController extends Controller
@@ -231,7 +232,6 @@ class TaskController extends Controller
 
     public function renameTranscriptionSpeaker(Request $request){
         try {
-            // return $request;
             $task = Task::findOrFail($request->task_id);
             $segments = json_decode($task->transcription_segments);
 
@@ -248,6 +248,59 @@ class TaskController extends Controller
         } catch (\Exception $ex) {
             alert()->error('Error', $ex->getMessage());
             return redirect()->back();
+        }
+    }
+
+    public function getTranscription($id){
+        try {
+            $task = Task::findOrFail($id);
+            $transcript = Transcription::findOrFail($task->transcription_id);
+            $min_speakers = (int)$transcript->speakers;
+            $max_speakers = (int)$transcript->speakers + 1;
+            $authorizationToken = "Bearer ".env('WISHPER_API_KEY');
+
+            // Check if the user wants to transcribe to English
+            if($transcript->transcribe_to_english == 1){
+                $transcribe_to_english = true; 
+            }else{
+                $transcribe_to_english = false;
+            }
+
+            $response = Http::withHeaders([
+                'Authorization' => $authorizationToken,
+            ])
+            ->timeout(300)
+            ->attach(
+                'file',
+                file_get_contents(public_path('user/audios/' . $task->audio_file_name)),
+                $task->audio_file_name
+            )
+            ->post('https://api.lemonfox.ai/v1/audio/transcriptions', [
+                'language'       => $transcript->language,
+                'speaker_labels' => true,
+                'translate'      => $transcribe_to_english,
+                'min_speakers'   => $min_speakers,
+                'max_speakers'   => $max_speakers,
+                'response_format'=> 'verbose_json',
+            ]);
+
+            $data = $response->json();
+
+            //Update task table
+            $task->transcription_segments = json_encode($data['segments']);
+            $task->transcripted           = 1;
+            $task->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Transcription successfully done",
+            ]);
+
+        } catch (\Exception $ex) {
+            return response()->json([
+                'error' => true,
+                'message' => $ex->getMessage()
+            ]);
         }
     }
 

@@ -19,7 +19,7 @@
                         <div class="card-header d-flex justify-content-between pb-0">
                             <h4 class="card-title">
                                 <i class="fa-regular fa-file-audio" style="font-size:25px;"></i> 
-                                {{ $task->transcription->audio_file_original_name }}
+                                {{ $task->audio_name }}
                             </h4>
                             <h6 class="card-title">
                                 @if ($task->status == "Completed")

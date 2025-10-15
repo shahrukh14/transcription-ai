@@ -37,17 +37,6 @@ class GeneralsettingsController extends Controller
             $settings->proofreading_language        = json_encode($request->input('proofreading_language'));
 
             $folder_path = public_path('admin/generalSetting/');
-
-            if (!File::exists($folder_path)) {
-                File::makeDirectory($folder_path, 0777, true, true);
-            }
-            if ($request->hasFile('icon')) {
-                $sl = rand();
-                $imageName = date('Ymd') . '_' . $sl . '.' . $request->icon->getClientOriginalExtension();
-                $request->icon->move($folder_path, $imageName);
-                $settings->icon = $imageName;
-            }
-            
             if (!File::exists($folder_path)) {
                 File::makeDirectory($folder_path, 0777, true, true);
             }
@@ -58,6 +47,17 @@ class GeneralsettingsController extends Controller
                 $settings->logo = $imageName;
             }
             $settings->save();
+
+            $folder_path = public_path('admin/icon/');
+            if (!File::exists($folder_path)) {
+                File::makeDirectory($folder_path, 0777, true, true);
+            }
+            if ($request->hasFile('icon')) {
+                $sl = rand();
+                $imageName = date('Ymd') . '_' . $sl . '.' . $request->icon->getClientOriginalExtension();
+                $request->icon->move($folder_path, $imageName);
+                $settings->icon = $imageName;
+            }
 
         } else {
             $settings = Generalsettings::first();
@@ -127,17 +127,18 @@ class GeneralsettingsController extends Controller
                 $request->icon->move($folder_path, $imageName);
                 $settings->icon = $imageName;
             }
+
+
+            $folder_path = public_path('admin/generalSetting/');
             if (!File::exists($folder_path)) {
                 File::makeDirectory($folder_path, 0777, true, true);
             }
-
             if ($request->hasFile('logo')) {
                 $sl = rand();
                 $imageName = date('Ymd') . '_' . $sl . '.' . $request->logo->getClientOriginalExtension();
                 $request->logo->move($folder_path, $imageName);
                 $settings->logo = $imageName;
             }
-            
             $settings->save();
         }
         return redirect()->back()->with('success', 'Settings updated successfully!');

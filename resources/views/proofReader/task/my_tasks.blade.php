@@ -77,8 +77,8 @@
                                         @foreach ($tasks as $index => $task)
                                         <tr>
                                             <td>
-                                                <a href="{{ route('proof-reader.tasks.view',$task->task_id) }}" title="{{$task->task->transcription->audio_file_original_name}}">
-                                                    {{ Str::limit($task->task->transcription->audio_file_original_name, 30, '...') }}
+                                                <a href="{{ route('proof-reader.tasks.view',$task->task_id) }}" title="{{$task->task->audio_name}}">
+                                                    {{ Str::limit($task->task->audio_name, 30, '...') }}
                                                 </a>
                                             </td>
                                             <td>
@@ -100,11 +100,17 @@
                                                     <span class="badge rounded-pill badge-light-success me-1">Completed</span>
                                                 @else
                                                     <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->task_id]) }}">
-                                                        <select name="status" id="" onchange="this.form.submit()" class="form-control">
-                                                            <option value="">Select</option>
-                                                            <option value="Claimed" {{ $task->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
-                                                            <option value="Unclaimed" {{ $task->status == 'Unclaimed' ? 'selected' : '' }}>Unclaimed</option>
-                                                        </select>
+                                                        @if ($task->status == "Claimed")
+                                                            <select name="status" id="" onchange="this.form.submit()" class="form-control">
+                                                                <option value="">Select</option>
+                                                                <option value="Unclaimed" {{ $task->status == 'Unclaimed' ? 'selected' : '' }}>Unclaimed</option>
+                                                            </select>
+                                                        @else
+                                                            <select name="status" id="" onchange="this.form.submit()" class="form-control">
+                                                                <option value="">Select</option>
+                                                                <option value="Claimed" {{ $task->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
+                                                            </select>
+                                                        @endif
                                                     </form>
                                                 @endif
                                             </td>

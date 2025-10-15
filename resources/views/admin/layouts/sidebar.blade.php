@@ -5,7 +5,8 @@
             <li class="nav-item me-auto h-100" style="margin: auto;">
                 @php  $existingSettings = App\Models\Generalsettings::first(); @endphp
                 @if($existingSettings && $existingSettings->logo != null)
-                    <a class="navbar-brand mt-2" style="height: 100% ; margin:0px;" href="{{route('admin.dashboard')}}"> <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" style="height: 29px "alt=""></span>
+                    <a class="navbar-brand mt-2" style="height: 100% ; margin:0px;" href="{{route('admin.dashboard')}}">
+                        <img src="{{ asset('admin/generalSetting/'.$existingSettings->logo)}}" style="height: 29px "alt=""></span>
                         <h2 class="brand-text"></h2>
                     </a>
                 @endif

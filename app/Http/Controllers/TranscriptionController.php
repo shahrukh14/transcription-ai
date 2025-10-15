@@ -21,110 +21,124 @@ use Illuminate\Support\Facades\Http;
 
 class TranscriptionController extends Controller
 {
-    public function audioUpload(Request $request){
+    public function audioUpload(Request $request)
+    {
         try {
             $folderPath = public_path('user/audios');
             File::ensureDirectoryExists($folderPath);
 
             if (!$request->hasFile('audio')) {
-                return response()->json(['error' => true, 'message' => 'No audio file found.']);
+                return response()->json(['error' => true, 'message' => 'No file found.']);
             }
 
-            // Generate unique code for this group of audio chunks
-            $audio_code = strtoupper(Str::random(10));
+            $file = $request->file('audio');
+            $mime = $file->getMimeType();
+            $isVideo = str_starts_with($mime, 'video/');
+            $isAudio = str_starts_with($mime, 'audio/');
 
-            $originalName = pathinfo($request->audio->getClientOriginalName(), PATHINFO_FILENAME);
+            if (!$isAudio && !$isVideo) {
+                return response()->json(['error' => true, 'message' => 'Only audio or video files are allowed.']);
+            }
+
+            $audio_code   = strtoupper(Str::random(10));
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $cleanedName  = str_replace('_', ' ', $originalName);
             $timestamp    = now()->format('YmdHis');
-            $extension    = $request->audio->getClientOriginalExtension();
+            $extension    = $file->getClientOriginalExtension();
             $baseName     = Str::slug($originalName, '_') . '_' . $timestamp;
 
             $uploadedPath = $folderPath . '/' . $baseName . '.' . $extension;
-            $request->file('audio')->move($folderPath, $baseName . '.' . $extension);
+            $file->move($folderPath, $baseName . '.' . $extension);
 
-            // Compress audio using shell_exec for reliability
+            $audioSourcePath = $uploadedPath;
+
+            // Extract audio if it's a video
+            if ($isVideo) {
+                $extractedPath = $folderPath . '/' . $baseName . '_extracted.wav';
+                $extractCmd = "ffmpeg -y -i \"$uploadedPath\" -vn -acodec pcm_s16le \"$extractedPath\"";
+                shell_exec($extractCmd);
+
+                if (!file_exists($extractedPath)) {
+                    Log::error("Failed to extract audio from video: $uploadedPath");
+                    File::delete($uploadedPath);
+                    return response()->json(['error' => true, 'message' => 'Failed to extract audio from video.']);
+                }
+
+                // Delete original video after extracting audio
+                File::delete($uploadedPath);
+                $audioSourcePath = $extractedPath;
+            }
+
+            // Compress the audio
             $compressedPath = $folderPath . '/' . $baseName . '_compressed.aac';
-            $cmd = "ffmpeg -y -i \"$uploadedPath\" -acodec aac -b:a 64k \"$compressedPath\"";
+            $cmd = "ffmpeg -y -i \"$audioSourcePath\" -acodec aac -b:a 64k \"$compressedPath\"";
             $output = shell_exec($cmd);
 
             if (!file_exists($compressedPath)) {
                 Log::error("FFmpeg compression failed: " . $output);
-                return response()->json(['error' => true, 'message' => 'Compression failed.']);
+                return response()->json(['error' => true, 'message' => 'Failed to compress audio.']);
             }
 
-            // Get total duration of the compressed file
-            $getID3   = new \getID3;
+            // Delete source (extracted or original audio)
+            File::delete($audioSourcePath);
+
+            // Analyze duration
+            $getID3 = new \getID3;
             $fileInfo = $getID3->analyze($compressedPath);
             $duration = isset($fileInfo['playtime_seconds']) ? (int) $fileInfo['playtime_seconds'] : 0;
 
-            $chunkDuration = 300; // 5 minutes
-            $totalChunks   = ceil($duration / $chunkDuration);
+            if ($duration <= 0) {
+                Log::warning("getID3 failed to get duration for: " . $compressedPath);
+                return response()->json(['error' => true, 'message' => "getID3 failed to get duration."]);
+            }
 
-            $language            = $request->language;
-            $speakers            = $request->speakers;
+            // Subscription Check
+            $language = $request->language;
+            $speakers = $request->speakers;
             $transcribeToEnglish = $request->transcribe_to_english;
 
             $subscription = auth()->user()->currentSubscription;
-            $limitSecs    = $subscription->audio_time_limit * 60;
-            $usedSecs     = auth()->user()->audioDurationWithCurrentPackage();
+            $limitSecs = $subscription->audio_time_limit * 60;
+            $usedSecs = auth()->user()->audioDurationWithCurrentPackage();
 
             if (($usedSecs + $duration) > $limitSecs) {
-                File::delete([$uploadedPath, $compressedPath]);
-                return response()->json([
-                    'error' => true,
-                    'message' => 'You have reached your audio time limit. Please upgrade your package.'
-                ]);
+                File::delete($compressedPath);
+                return response()->json(['error' => true, 'message' => 'You have reached your audio time limit.']);
             }
 
             if ($subscription->transcription_limit != 0) {
                 $usedTrans = auth()->user()->audioTrascriptionWithCurrentPackage();
                 $remainingTrans = $subscription->transcription_limit - $usedTrans;
-                if ($remainingTrans < $totalChunks) {
-                    File::delete([$uploadedPath, $compressedPath]);
-                    return response()->json([
-                        'error' => true,
-                        'message' => 'You have reached your transcription limit. Please upgrade your package.'
-                    ]);
+                if ($remainingTrans < 1) {
+                    File::delete($compressedPath);
+                    return response()->json(['error' => true, 'message' => 'Transcription limit reached.']);
                 }
             }
 
-            for ($i = 0; $i < $totalChunks; $i++) {
-                $start      = $i * $chunkDuration;
-                $outName    = $baseName . "_part_" . ($i + 1) . '.aac';
-                $outputPath = $folderPath . '/' . $outName;
-
-                // Split using FFmpeg shell command
-                $splitCmd = "ffmpeg -y -i \"$compressedPath\" -ss {$start} -t {$chunkDuration} -c copy \"$outputPath\"";
-                shell_exec($splitCmd);
-
-                $chunkActualDuration = min($chunkDuration, $duration - $start);
-
-                // Save DB record
-                $transcription = new Transcription();
-                $transcription->user_id                  = auth()->user()->id;
-                $transcription->audio_code               = $audio_code;
-                $transcription->language                 = $language;
-                $transcription->speakers                 = $speakers;
-                $transcription->audio_file_name          = $outName;
-                $transcription->audio_file_duration      = $chunkActualDuration;
-                $transcription->transcribe_to_english    = $transcribeToEnglish;
-                $transcription->audio_file_original_name = $cleanedName . ' (Part ' . ($i + 1) . ')';
-                $transcription->transcribe_with_package  = $subscription->id;
-                $transcription->save();
-            }
-
-            // Clean up temp files
-            File::delete([$uploadedPath, $compressedPath]);
+            // Save to DB
+            $transcription                              = new Transcription();
+            $transcription->user_id                     = auth()->user()->id;
+            $transcription->audio_code                  = $audio_code;
+            $transcription->language                    = $language;
+            $transcription->speakers                    = $speakers;
+            $transcription->audio_file_name             = basename($compressedPath);
+            $transcription->audio_file_duration         = $duration;
+            $transcription->transcribe_to_english       = $transcribeToEnglish;
+            $transcription->audio_file_original_name    = $cleanedName;
+            $transcription->transcribe_with_package     = $subscription->id;
+            $transcription->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Audio uploaded, compressed, split, and saved successfully.'
+                'message' => 'Audio uploaded, compressed, and saved successfully.'
             ]);
+
         } catch (\Exception $ex) {
             Log::error('Audio upload error: ' . $ex->getMessage());
             return response()->json(['error' => true, 'message' => $ex->getMessage()]);
         }
     }
+
 
     public function renderTranscriptionTable(){
         try {
@@ -145,7 +159,8 @@ class TranscriptionController extends Controller
             $transcriptions = Transcription::where('user_id', auth()->user()->id)->where('status', 0)->get();
             foreach ($transcriptions as $transcript) {
                 // Generate public URL for the audio file
-                $fileUrl = route('audio.download', ['path'=>'user/audios/','filename' => $transcript->audio_file_name]);
+               
+                $fileUrl = asset('user/audios/' . $transcript->audio_file_name);
                 $min_speakers = (int)$transcript->speakers;
                 $max_speakers = (int)$transcript->speakers + 1;
                 $authorizationToken = "Bearer ".env('WISHPER_API_KEY');
@@ -158,20 +173,37 @@ class TranscriptionController extends Controller
                 }
     
                 // API request to lemonfox for speech-to-text transcription
+                // $response = Http::withHeaders([
+                //     'Authorization' => $authorizationToken,
+                // ])->timeout(300)->post('https://api.lemonfox.ai/v1/audio/transcriptions', [
+                //     'file'           => $fileUrl, // Send the audio file URL
+                //     'language'       => $transcript->language,
+                //     'speaker_labels' => true,
+                //     'translate'      => $transcribe_to_english,
+                //     'min_speakers'   => $min_speakers, 
+                //     'max_speakers'   => $max_speakers, 
+                //     'response_format'=> 'verbose_json',
+                // ]);
+                
                 $response = Http::withHeaders([
                     'Authorization' => $authorizationToken,
-                ])->timeout(300)->post('https://api.lemonfox.ai/v1/audio/transcriptions', [
-                    'file'           => $fileUrl, // Send the audio file URL
+                ])
+                ->timeout(300)
+                ->attach(
+                    'file',
+                    file_get_contents(public_path('user/audios/' . $transcript->audio_file_name)),
+                    $transcript->audio_file_name
+                )
+                ->post('https://api.lemonfox.ai/v1/audio/transcriptions', [
                     'language'       => $transcript->language,
                     'speaker_labels' => true,
                     'translate'      => $transcribe_to_english,
-                    'min_speakers'   => $min_speakers, 
-                    'max_speakers'   => $max_speakers, 
+                    'min_speakers'   => $min_speakers,
+                    'max_speakers'   => $max_speakers,
                     'response_format'=> 'verbose_json',
                 ]);
 
                 $data = $response->json();
-                return $data;
                 //Update transcript in table
                 $transcript->transcription_from_api          = $data['text'];
                 $transcript->transcription_segments          = json_encode($data['segments']);
@@ -430,65 +462,127 @@ class TranscriptionController extends Controller
         return response()->download($filePath);
     }
     
-    public function addToProofReading(Request $request, $id){
+    public function addToProofReading(Request $request, $id){       
         try {
             $transcription = Transcription::find($id);
-            $transcription->add_to_proofreading = 1;
-            $transcription->save();
 
             $generalsettings = Generalsettings::first();
+            $audioBasePath = public_path('user/audios');
 
-            //Attachment upload
+            // Attachment upload
+            $fileNames = [];
             if ($request->hasFile('attachments')) {
-                $fileNames = [];
                 $folder_path = public_path('proofreading/attachments');
                 if (!File::exists($folder_path)) {
                     File::makeDirectory($folder_path, 0777, true, true);
                 }
-                foreach($request->attachments as $attachment){
+                foreach ($request->attachments as $attachment) {
                     $filename = date('Ymd') . '_' . rand() . '.' . $attachment->getClientOriginalExtension();
                     $attachment->move($folder_path, $filename);
                     $fileNames[] = $filename;
                 }
-            }else{
-                $fileNames = [];
             }
 
-            //Calculate time for the proof readig
-            $audioDurationInMinutes = round($transcription->audio_file_duration / 60);
-            $proof_reading_time_duration_per_minute = $generalsettings->proof_reading_time_duration; //in minutes
-            $proof_reading_total_time = $audioDurationInMinutes * $proof_reading_time_duration_per_minute;
+            // Speaker Marking Check
+            $speakerMarking = $request->speaker_marking == 1;
 
-            $ifExsists = Task::where('transcription_id', $id)->first();
-            if($ifExsists){
-                $ifExsists->uploaded_dt                 = Date::now();
-                $ifExsists->price                       = $request->price;
-                $ifExsists->instruction                 = $request->instruction;
-                $ifExsists->attachment                  = json_encode($fileNames);
-                $ifExsists->status                      = NULL;
-                $ifExsists->transcription_segments      = $transcription->transcription_segments;
-                $ifExsists->proof_reading_time_duration = $proof_reading_total_time; //in minutes
-                $ifExsists->save();
-            }else{
-                $addToTasks                              = new Task();
-                $addToTasks->transcription_id            = $id;
-                $addToTasks->uploaded_dt                 = Date::now();
-                $addToTasks->level                       = 1;
-                $addToTasks->price                       = $request->price;
-                $addToTasks->instruction                 = $request->instruction;
-                $addToTasks->attachment                  = json_encode($fileNames);
-                $addToTasks->transcription_segments      = $transcription->transcription_segments;
-                $addToTasks->proof_reading_time_duration = $proof_reading_total_time; //in minutes
-                $addToTasks->save();
+            // Duration per minute
+            $proofReadingPerMinuteRate      = (int) $generalsettings->proof_reading_per_minute;
+            $speakerMarkingPerMinuteRate    = (int) $generalsettings->speaker_marking_per_minute;
+            $proofReadingTimePerMinute      = $generalsettings->proof_reading_time_duration;
+
+            // Check if task already exist
+            $existingTasks = Task::where('transcription_id', $id)->get();
+
+            if ($existingTasks->count() > 0) {
+                foreach ($existingTasks as $task) {
+                    $audioDurationInMinutes = round($task->audio_duration / 60);
+                    $price = $audioDurationInMinutes * $proofReadingPerMinuteRate;
+                    if ($speakerMarking) {
+                        $price += $audioDurationInMinutes * $speakerMarkingPerMinuteRate;
+                    }
+                    $totalProofTime = $audioDurationInMinutes * $proofReadingTimePerMinute;
+
+                    $task->uploaded_dt                  = Date::now();
+                    $task->price                        = $price;
+                    $task->instruction                  = $request->instruction;
+                    $task->attachment                   = json_encode($fileNames);
+                    $task->status                       = NULL;
+                    $task->transcription_segments       = $transcription->transcription_segments;
+                    $task->proof_reading_time_duration  = $totalProofTime;
+                    $task->save();
+                }
+            } else {
+                // Split compressed audio
+                $compressedFilePath = $audioBasePath . '/' . $transcription->audio_file_name;
+                if (!File::exists($compressedFilePath)) {
+                    alert()->error('Error', "Audio file not found.");
+                    return redirect()->back();
+                }
+
+                $outputFolder = public_path('user/audios');
+                if (!File::exists($outputFolder)) {
+                    File::makeDirectory($outputFolder, 0777, true, true);
+                }
+
+                // Get duration
+                $durationCmd    = "ffprobe -i \"$compressedFilePath\" -show_entries format=duration -v quiet -of csv=\"p=0\"";
+                $duration       = (float) shell_exec($durationCmd);
+                $chunkDuration  = (float) ($generalsettings->audio_split_duration * 60);
+                $parts          = ceil($duration / $chunkDuration);
+
+                $originalNameSlug = Str::slug(pathinfo($transcription->audio_file_original_name, PATHINFO_FILENAME));
+
+                for ($i = 0; $i < $parts; $i++) {
+                    $start          = $i * $chunkDuration;
+                    $partFilename   = $originalNameSlug . '_part_' . ($i + 1) . '.aac';
+                    $outputPath     = $outputFolder . '/' . $partFilename;
+
+                    // Split chunk
+                    $splitCmd = "ffmpeg -y -ss $start -t $chunkDuration -i \"$compressedFilePath\" -acodec aac -b:a 64k \"$outputPath\"";
+                    shell_exec($splitCmd);
+
+                    // Get chunk duration
+                    $chunkDurationCmd   = "ffprobe -i \"$outputPath\" -show_entries format=duration -v quiet -of csv=\"p=0\"";
+                    $chunkLength        = (float) shell_exec($chunkDurationCmd);
+                    $chunkMinutes       = round($chunkLength / 60);
+
+                    $price = $chunkMinutes * $proofReadingPerMinuteRate;
+                    if ($speakerMarking) {
+                        $price += $chunkMinutes * $speakerMarkingPerMinuteRate;
+                    }
+
+                    $proofTime = $chunkMinutes * $proofReadingTimePerMinute;
+
+                    // Save task
+                    $task                               = new Task();
+                    $task->transcription_id             = $transcription->id;
+                    $task->uploaded_dt                  = Date::now();
+                    $task->audio_name                   = $transcription->audio_file_original_name . ' Part-' . ($i + 1);
+                    $task->audio_file_name              = $partFilename;
+                    $task->level                        = 1;
+                    $task->price                        = $price;
+                    $task->instruction                  = $request->instruction;
+                    $task->attachment                   = json_encode($fileNames);
+                    $task->audio_duration               = $chunkLength;
+                    $task->proof_reading_time_duration  = $proofTime;
+                    $task->save();
+                }
             }
-           
-            alert()->success('success', 'Your transcription has beed added to proof reading.');
+
+            //Update transcription
+            $transcription->add_to_proofreading = 1;
+            $transcription->save();
+
+            alert()->success('Success', 'Your transcription has been added to proofreading.');
             return redirect()->back();
+
         } catch (\Exception $ex) {
-            alert()->error('error', $ex->getMessage());
+            alert()->error('Error', $ex->getMessage());
             return redirect()->back();
         }
     }
+
 
     public function renameFile(Request $request){
         try {

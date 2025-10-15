@@ -137,6 +137,7 @@
                         <label for="speakers" class="form-label">How many speakers?</label>
                         <select class="select2 form-select" id="speakers" aria-label="Speaker count selection">
                             <option selected disabled>Select number of speakers</option>
+                            <option value="1">1 speaker</option>
                             <option value="2">2 speakers</option>
                             <option value="3">3 speakers</option>
                             <option value="4">4 speakers</option>
@@ -437,7 +438,6 @@ $(document).ready(function () {
             url: "{{ route('user.transcription.get') }}",
             type: "GET",
             success: function (response) {
-                console.log(response);
                 renderTranscriptionTable()
             }
         });

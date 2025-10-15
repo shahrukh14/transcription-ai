@@ -13,23 +13,24 @@
                             <div class="card-header d-flex justify-content-between pb-0">
                                 <h4 class="card-title">
                                     <i class="fa-regular fa-file-audio" style="font-size:25px;"></i> 
-                                    {{ $task->transcription->audio_file_original_name }}
+                                    {{ $transcription->audio_file_original_name }}
                                 </h4>
                                 <h6 class="card-title">
-                                    @if ($task->status == "Completed")
+                                    @if ($transcription->tasksStatus == "Completed")
                                         <span class="badge rounded-pill badge-light-success me-1">Completed</span>
-                                    @elseif($task->status == "Claimed")
+                                    @elseif($transcription->tasksStatus == "Claimed")
                                         <span class="badge rounded-pill badge-light-warning me-1">Claimed</span>
-                                    @elseif($task->status == "Unclaimed")
+                                    @elseif($transcription->tasksStatus == "Unclaimed")
                                         <span class="badge rounded-pill badge-light-danger me-1">Unclaimed</span>
-                                    @elseif($task->status == "Cancelled")
+                                    @elseif($transcription->tasksStatus == "Cancelled")
                                         <span class="badge rounded-pill badge-light-danger me-1">Cancelled</span>
                                     @else
                                         <span class="badge rounded-pill badge-light-secondary me-1">Not Claimed</span>
                                     @endif
                                 </h6>
                             </div><hr>
-                            @if($task->document != null)
+                            {{-- @if($task->document != null) --}}
+                            @if(false)
                             <div class="card-body pt-0">
                                 <div class="row">
                                     @php
@@ -51,26 +52,30 @@
                             @else
                             <div class="card-body pt-0">
                                 <div class="row">
-                                    <p class="fw-bolder">{{date('d M Y, h:i A', strtotime($task->created_at))}}</p>
+                                    <p class="fw-bolder">{{date('d M Y, h:i A', strtotime($transcription->created_at))}}</p>
                                     <div class="form-floating col-md-12">
-                                        @php 
-                                            $transcription_segments = $task->transcription_segments;
-                                        @endphp
-                                        @foreach (json_decode($transcription_segments)??[] as $segment)
-                                            @php
-                                                $timeInSeconds  = $segment->start;
-                                                $minutes        = floor($timeInSeconds / 60);
-                                                $seconds        = $timeInSeconds - ($minutes * 60);
-                                                $roundedSeconds = round($seconds);
-                                                $formattedTime  = sprintf("%02d:%02d", $minutes, $roundedSeconds);
+                                        @php $price = 0; @endphp
+                                        @foreach ($transcription->tasks as $task)
+                                            @php 
+                                                $transcription_segments = $task->transcription_segments;
+                                                $price += $task->price;
                                             @endphp
-                                            <div class="pt-1">
-                                                <span class="fw-bolder">{{ $allSpeakers[$segment->speaker] }}</span>
-                                                <p class="@if($task->status != 'Completed') segment @endif segment-style">
-                                                    <span style="color: #717272" class="time-stamp">({{ $formattedTime }})</span>
-                                                    <span class="editable-text">{{ $segment->text }}</span>
-                                                </p>
-                                            </div>
+                                            @foreach(json_decode($transcription_segments)??[] as $segment)
+                                                @php
+                                                    $timeInSeconds  = $segment->start;
+                                                    $minutes        = floor($timeInSeconds / 60);
+                                                    $seconds        = $timeInSeconds - ($minutes * 60);
+                                                    $roundedSeconds = round($seconds);
+                                                    $formattedTime  = sprintf("%02d:%02d", $minutes, $roundedSeconds);
+                                                @endphp
+                                                <div class="pt-1">
+                                                    <span class="fw-bolder speaker">{{ $allSpeakers[$segment->speaker] ?? '' }}</span>
+                                                    <p class="@if($transcription->tasksStatus != 'Completed') segment @endif segment-style">
+                                                        <span style="color: #717272" class="time-stamp">({{ $formattedTime }})</span>
+                                                        <span class="editable-text">{{ $segment->text }}</span>
+                                                    </p>
+                                                </div>
+                                            @endforeach
                                         @endforeach
                                     </div>
                                 </div>
@@ -82,7 +87,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div>
-                                    <span class="fw-bolder h4">Proof Reading Cost : ₹ {{number_format($task->price,2)}}</span>
+                                    <span class="fw-bolder h4">Proof Reading Cost : ₹ {{number_format($price, 2)}}</span>
                                 </div>
                             </div>
                         </div>
@@ -90,7 +95,8 @@
                             <div class="card-body">
                                 <h4>Export</h4>
                                 <ul class="list-group mb-1">
-                                    @if($task->document != null)
+                                    {{-- @if($task->document != null) --}}
+                                    @if(false)
                                      <li class="list-group-item">
                                         <a href="{{$fileUrl}}" title="Download Document"  download="{{$task->document}}">
                                             <i class="fa-solid fa-file"></i> Download Document
@@ -98,19 +104,18 @@
                                     </li>
                                     @else
                                     <li class="list-group-item">
-                                        <a href="{{ route('user.proof.reading.pdf.download',$task->id) }}" title="PDF Download" id="pdfDownloadUrl" data-base-url="{{ route('user.proof.reading.pdf.download', $task->id) }}">
+                                        <a href="{{ route('user.proof.reading.pdf.download',$transcription->id) }}" title="PDF Download" id="pdfDownloadUrl" data-base-url="{{ route('user.proof.reading.pdf.download', $transcription->id) }}">
                                             <i class="fa-solid fa-file-pdf"></i> Download PDF
                                         </a>
                                     </li>
                                     <li class="list-group-item">
-                                        <a href="{{ route('user.proof.reading.docx.download',$task->id) }}" title="PDF Download" id="docxDownloadUrl" data-base-url="{{ route('user.proof.reading.docx.download', $task->id) }}">
+                                        <a href="{{ route('user.proof.reading.docx.download',$transcription->id) }}" title="PDF Download" id="docxDownloadUrl" data-base-url="{{ route('user.proof.reading.docx.download', $transcription->id) }}">
                                             <i class="fa-solid fa-file-word"></i> Download DOCX
                                         </a>
                                     </li>
                                     @endif
                                 </ul>
 
-                                @if($task->document == null)
                                 <h4 class="mb-1">More</h4>
                                 <div class="row">
                                     <div class="col-md-12 mb-1">
@@ -126,11 +131,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                @endif
                             </div>
                         </div>
 
-                        @if($task->status== "Cancelled")
+                        @if($transcription->tasksStatus == "Cancelled")
                             <button type="button" class="btn btn-primary w-100" id="addToProofReadingBtn"> Add to Proof Reading </button>
                         @endif
                     </div>
@@ -146,7 +150,7 @@
 <div class="modal fade" id="proofReadingModal" tabindex="-1" aria-labelledby="proofReadingModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <form action="{{ route('user.transcription.add.to.proof.reading', ['id' => $task->transcription->id]) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('user.transcription.add.to.proof.reading', ['id' => $transcription->id]) }}" method="POST" enctype="multipart/form-data">
             @csrf
                 <div class="modal-header">
                     <h4 class="modal-title" id="proofReadingModalLabel"> <i class="fa-solid fa-file-lines"></i> Add to proof reading</h4>
@@ -154,8 +158,8 @@
                 </div>
                 <div class="modal-body">
                     @php
-                        $settings = App\Models\Generalsettings::first();
-                        $timeInSeconds  = $task->transcription->audio_file_duration;
+                        $settings       = App\Models\Generalsettings::first();
+                        $timeInSeconds  = $transcription->audio_file_duration;
                         $hours          = floor($timeInSeconds / 3600);
                         $minutes        = floor(($timeInSeconds % 3600) / 60);
                         $seconds        = $timeInSeconds % 60;
@@ -180,7 +184,7 @@
                     @if(auth()->user()->balance > $charge)
                         <div class="row">
                             <div class="col-md-12 mb-1">
-                                <h4>File Name: {{$task->transcription->audio_file_original_name}}</h4>
+                                <h4>File Name: {{$transcription->audio_file_original_name}}</h4>
                                 <h4>Duration : {{$formattedTime}}</h4>
                             </div>
                             <div class="col-md-12 mb-1">
@@ -188,7 +192,7 @@
                             </div>
                             <div class="col-md-12 mb-1">
                                 <h4>
-                                    Click<a href="{{ route('user.transcription.docx.download',$task->transcription->id) }}"> here </a>to download the transcripted file.
+                                    Click<a href="{{ route('user.transcription.docx.download',$transcription->id) }}"> here </a>to download the transcripted file.
                                 </h4> 
                             </div>
                             <input type="hidden" name="price" id="price" value="{{ $charge }}">

@@ -85,6 +85,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="navbar-brand" href="{{ route('why.proof.reading')}}">
+                        <span class="brand-text mb-0">Why proof reading</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="navbar-brand" href="{{ route('blog')}}">
                         <span class="brand-text mb-0">Blog</span>
                     </a>

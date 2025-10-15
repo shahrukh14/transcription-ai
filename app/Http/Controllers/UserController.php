@@ -47,50 +47,40 @@ class UserController extends Controller
     //for user task table listing 
     public function proofReading(Request $request)
     {
-        $query = Task::with('transcription');
-        $query->whereHas('transcription', function ($q){
-            $q->where(function ($query) {
-                $query->where('user_id', auth()->user()->id);
-            });
-        });
+        $query = Transcription::where('user_id', auth()->user()->id)->where('add_to_proofreading', 1);
         
         //filter by audio name
         if ($request->has('search') && !empty($request->search)){
-            $searchTerms = explode(' ', $request->search);
-            $query->whereHas('transcription', function ($q) use ($searchTerms) {
-                foreach ($searchTerms as $term) {
-                    $q->where(function ($query) use ($term) {
-                        $query->where('user_id', auth()->user()->id);
-                        $query->where('audio_file_original_name', 'LIKE', '%' . $term . '%');
-                    });
-                }
-            });
+            $query->where('audio_file_original_name', 'LIKE', '%' . $request->search . '%');
         }
-        $tasks = $query->paginate(10);
-        return view('user.task-listing', compact('tasks'));
+
+        $transcriptions = $query->paginate(10);
+        return view('user.task-listing', compact('transcriptions'));
     }
 
-    public function proofReadingView($id){   
-        $task = Task::find($id);
-        if($task->transcription->user_id != auth()->user()->id){
+    public function proofReadingView($id){
+        $transcription = Transcription::find($id);
+        if($transcription->user_id != auth()->user()->id){
             alert()->error('error', 'You do not have access for this view this task');
             return redirect()->route('user.proof.reading');
         }
 
-        if($task->payment != "Paid"){
+        if($transcription->tasks->contains(fn($t) => $t->payment != "Paid")){
             alert()->error('error', 'You have to pay the proof reading amount to view this proof reading');
             return redirect()->route('user.proof.reading');
         }
 
         $allSpeakers = []; 
         $speakerCounter = 1;
-        $transcription_segments =  $task->transcription_segments;
-        foreach(json_decode($transcription_segments)??[] as $segment){
-            if (!isset($allSpeakers[$segment->speaker])) {
-                $allSpeakers[$segment->speaker] = 'Speaker ' . $speakerCounter++;
+        foreach($transcription->tasks as $task){
+            $transcription_segments =  $task->transcription_segments;
+            foreach(json_decode($transcription_segments)??[] as $segment){
+                if (!isset($allSpeakers[$segment->speaker])) {
+                    $allSpeakers[$segment->speaker] = 'Speaker ' . $speakerCounter++;
+                }
             }
         }
-        return view('user.task_view', compact('task','allSpeakers'));
+        return view('user.task_view', compact('transcription','allSpeakers'));
     }
 
     public function proofReadingCancel($id){ 
@@ -109,19 +99,19 @@ class UserController extends Controller
     }
 
     public function proofReadingPdfDownload(Request $request, $id){
-        $task = Task::find($id); 
-        $pdf = Pdf::loadView('user.proofreading_pdf', compact('task','request'));
-        $fileName = $task->transcription->audio_file_original_name.".pdf";
+        $transcription = Transcription::find($id); 
+        $pdf = Pdf::loadView('user.proofreading_pdf', compact('transcription','request'));
+        $fileName = $transcription->audio_file_original_name.".pdf";
         return $pdf->download($fileName);
     }
 
     public function proofReadingDocxDownload(Request $request, $id){
-        $task = Task::find($id); 
-        $phpWord = new PhpWord();
-        $section = $phpWord->addSection();
+        $transcription  = Transcription::find($id); 
+        $phpWord        = new PhpWord();
+        $section        = $phpWord->addSection();
 
         // Add audio file name
-        $section->addText("File Name: " . $task->transcription->audio_file_original_name, [
+        $section->addText("File Name: " . $transcription->audio_file_original_name, [
             'bold' => true,
             'size' => 14
         ]);
@@ -129,50 +119,48 @@ class UserController extends Controller
         // Prepare speaker map and counter
         $speakerMap = [];
         $speakerCounter = 1;
+        foreach($transcription->tasks as $task){
+            $segments = json_decode($task->transcription_segments);
+            if (!empty($segments)) {
+                foreach ($segments as $segment) {
+                    $line = '';
 
-        $segments = json_decode($task->transcription_segments);
+                    // Speaker mapping
+                    if (!isset($speakerMap[$segment->speaker])) {
+                        $speakerMap[$segment->speaker] = 'Speaker ' . $speakerCounter++;
+                    }
 
-        if (!empty($segments)) {
-            foreach ($segments as $segment) {
-                $line = '';
+                    // Format timestamp
+                    $timeInSeconds = $segment->start;
+                    $minutes = floor($timeInSeconds / 60);
+                    $seconds = round($timeInSeconds % 60);
+                    $formattedTime = sprintf("%02d:%02d", $minutes, $seconds);
 
-                // Speaker mapping
-                if (!isset($speakerMap[$segment->speaker])) {
-                    $speakerMap[$segment->speaker] = 'Speaker ' . $speakerCounter++;
+                    // Build speaker + timestamp line if applicable
+                    if ($request->speaker == "true") {
+                        $line .= $speakerMap[$segment->speaker];
+                    }
+
+                    if ($request->timestamp == "true") {
+                        $line .= ($line ? ' ' : '') . "($formattedTime)";
+                    }
+
+                    // Add the speaker+timestamp line if it's not empty
+                    if (!empty($line)) {
+                        $section->addText($line, ['bold' => true, 'color' => '333333']);
+                    }
+
+                    // Always add the actual spoken text
+                    $section->addText($segment->text, ['size' => 12]);
                 }
-
-                // Format timestamp
-                $timeInSeconds = $segment->start;
-                $minutes = floor($timeInSeconds / 60);
-                $seconds = round($timeInSeconds % 60);
-                $formattedTime = sprintf("%02d:%02d", $minutes, $seconds);
-
-                // Build speaker + timestamp line if applicable
-                if ($request->speaker == "true") {
-                    $line .= $speakerMap[$segment->speaker];
-                }
-
-                if ($request->timestamp == "true") {
-                    $line .= ($line ? ' ' : '') . "($formattedTime)";
-                }
-
-                // Add the speaker+timestamp line if it's not empty
-                if (!empty($line)) {
-                    $section->addText($line, ['bold' => true, 'color' => '333333']);
-                }
-
-                // Always add the actual spoken text
-                $section->addText($segment->text, ['size' => 12]);
             }
         }
 
         // Save and download
-        $fileName = $task->transcription->audio_file_original_name . '.docx';
-        $path = public_path($fileName);
-
-        $writer = IOFactory::createWriter($phpWord, 'Word2007');
+        $fileName = $transcription->audio_file_original_name . '.docx';
+        $path     = public_path($fileName);
+        $writer   = IOFactory::createWriter($phpWord, 'Word2007');
         $writer->save($path);
-
         return response()->download($path)->deleteFileAfterSend(true);
     }
 
