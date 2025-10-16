@@ -64,50 +64,48 @@
                                 <table class="datatables-ajax table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>@lang('Audio')</th>
-                                            <th>@lang('Uploaded At')</th>
-                                            <th>@lang('Claimed At')</th>
+                                            <th>@lang('File Name')</th>
+                                            <th>@lang('Audio Language')</th>
                                             <th>@lang('Completed At')</th>
                                             <th>@lang('Claim Tasks')</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @if (count($tasks) > 0)
-                                        @foreach ($tasks as $index => $task)
-                                        <tr>
-                                            <td>
-                                                <a href="{{ route('proof-reader.tasks.view',$task->id) }}" title="{{$task->transcription->audio_file_original_name}}">
-                                                    {{ Str::limit($task->audio_name, 30, '...') }}
-                                                </a>
-                                            </td>
-                                            <td>{{date('d M Y, h:i A', strtotime($task->uploaded_dt))}}</td>
-                                            <td>{!! ($task->claimed_dt != null) ? date('d M Y, h:i A', strtotime($task->claimed_dt)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Claimed</span>' !!}</td>
-                                            <td>{!! ($task->task_complete_time != null) ? date('d M Y, h:i A', strtotime($task->task_complete_time)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Completed</span>' !!}</td>
-                                            <td>
-                                                @if ($task->status == "Completed")
-                                                    <span class="badge rounded-pill badge-light-success me-1">Completed</span>
-                                                @else
-                                                    <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->id]) }}">
-                                                        @if ($task->status == "Claimed")
-                                                            <select name="status" id="" onchange="this.form.submit()" class="form-control">
-                                                                <option value="">Select</option>
-                                                                <option value="Unclaimed" {{ $task->status == 'Unclaimed' ? 'selected' : '' }}>Unclaimed</option>
-                                                            </select>
+                                            @foreach ($tasks as $index => $task)
+                                                <tr>
+                                                    <td>
+                                                        <a href="{{ route('proof-reader.tasks.view',$task->id) }}" title="{{$task->audio_name}}">
+                                                            {{ Str::limit($task->audio_name, 30, '...') }}
+                                                        </a>
+                                                    </td>
+                                                    <td>{{ucfirst($task->transcription->language)}}</td>
+                                                    <td>{!! ($task->task_complete_time != null) ? date('d M Y, h:i A', strtotime($task->task_complete_time)) : '<span class="badge rounded-pill badge-light-warning me-1">Not Completed</span>' !!}</td>
+                                                    <td>
+                                                        @if ($task->status == "Completed")
+                                                            <span class="badge rounded-pill badge-light-success me-1">Completed</span>
                                                         @else
-                                                            <select name="status" id="" onchange="this.form.submit()" class="form-control">
-                                                                <option value="">Select</option>
-                                                                <option value="Claimed" {{ $task->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
-                                                            </select>
+                                                            <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->id]) }}">
+                                                                @if ($task->status == "Claimed")
+                                                                    <select name="status" id="" onchange="this.form.submit()" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                        <option value="Unclaimed" {{ $task->status == 'Unclaimed' ? 'selected' : '' }}>Unclaimed</option>
+                                                                    </select>
+                                                                @else
+                                                                    <select name="status" id="" onchange="this.form.submit()" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                        <option value="Claimed" {{ $task->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
+                                                                    </select>
+                                                                @endif
+                                                            </form>
                                                         @endif
-                                                    </form>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @endforeach
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @else
-                                        <tr class="text-center">
-                                            <td colspan="5"><h4>No data found</h4></td>
-                                        </tr>
+                                            <tr class="text-center">
+                                                <td colspan="5"><h4>No data found</h4></td>
+                                            </tr>
                                         @endif
                                     </tbody>
                                 </table>

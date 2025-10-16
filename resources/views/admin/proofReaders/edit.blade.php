@@ -48,8 +48,52 @@
                                 <input type="text" class="form-control" placeholder="@lang('Enter mobile number')" name="mobile" id="mobile"  value="{{$proofReader->mobile}}"  required>
                             </div>
                             <div class="col-md-6 mb-1">
+                                <label for="image" class="form-label">@lang('Password')</label>
+                                <input type="password" class="form-control" name="password" id="password">
+                            </div>
+                            {{--  --}}
+                            <div class="col-md-6 mb-1">
+                                <label for="image" class="form-label">@lang('Languages known')</label>
+                                <select class="select2 form-select languageSelect" id="select2-basic" name="language_known[]" required multiple>
+                                    <option disabled>Select Language</option>
+                                    @php
+                                        $selectedLanguages = json_decode($proofReader->language_known, true) ?? [];
+                                    @endphp
+                                    @foreach ($languages as $language)
+                                        <option value="{{ $language }}" {{ in_array($language, $selectedLanguages) ? 'selected' : '' }}>
+                                            {{ Illuminate\Support\Str::ucfirst($language) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <label for="typing_speed" class="form-label">@lang('Typing Speed')</label>
+                                <input class="form-control" type="text" id="typing_speed" name="typing_speed" value="{{ $proofReader->typing_speed }}"/>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <label for="work_hours" class="form-label">@lang('How Much Time You Can Devote To Work')</label>
+                                <input class="form-control" type="text" id="work_hours" name="work_hours" value="{{ $proofReader->work_hours }}" required/>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <label for="city" class="form-label">@lang('City')</label>
+                                <input class="form-control" type="text" id="city" name="city" value="{{ $proofReader->city }}"/>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <label for="state" class="form-label">@lang('State')</label>
+                                <input class="form-control" type="text" id="state" name="state" value="{{$proofReader->state}}"/>
+                            </div>
+                            <div class="col-md-6 mb-1">
                                 <label for="image" class="form-label">@lang('Profile Picture')</label>
                                 <input type="file" class="form-control" name="image" id="image">
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <div>
+                                    @if($proofReader->image && file_exists(public_path('admin/proofreaders/' . $proofReader->image)))
+                                        <img src="{{ asset('admin/proofreaders/' . $proofReader->image) }}" alt="Profile Image" class="img-fluid" style="max-height: 70px; border-radius: 8px;">
+                                    @else
+                                        <p>No image uploaded</p>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">@lang('Save')</button>

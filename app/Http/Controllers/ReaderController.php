@@ -27,7 +27,8 @@ class ReaderController extends Controller
 
     public function profile(){
         $reader = auth()->guard('reader')->user();
-        return view('proofReader.profile', compact('reader'));
+        $languages = DB::table('languages')->orderBy('name', 'ASC')->pluck('name')->toArray();
+        return view('proofReader.profile', compact('reader', 'languages'));
     }
 
     public function profileUpdate(Request $request){
@@ -55,6 +56,13 @@ class ReaderController extends Controller
             $reader->mobile      = $request->mobile;
             $reader->password    = $password;
             $reader->image       = $imageName;
+            $reader->typing_speed = $request->typing_speed;
+            $reader->work_hours  = $request->work_hours;
+            $reader->city        = $request->city;
+            $reader->state       = $request->state;
+            if ($request->has('language_known')) {
+                $reader->language_known = json_encode($request->language_known);
+            }
             $reader->save();
 
             alert()->success('success', 'Profile Updated Sucessfully');
@@ -166,6 +174,28 @@ class ReaderController extends Controller
         $proofreader->save();
         alert()->success('Success', 'Deatils Submitted');
         return redirect()->route('proof-reader.assessment');
+    }
+
+    //insert bank details
+    public function bankDetails(Request $request, $id)
+    {
+        $request->validate([
+            'bank_name'   => 'required|string|max:255',
+            'branch'      => 'required|string|max:255',
+            'account_no'  => 'required|string|max:50',
+            'ifsc'        => 'required|string|max:20',
+        ]);
+        $reader = ProofReader::findOrFail($id);
+
+        // Store data in JSON format
+        $reader->bank_details = [
+            'bank_name'   => $request->bank_name,
+            'branch'      => $request->branch,
+            'account_no'  => $request->account_no,
+            'ifsc'        => $request->ifsc,
+        ];
+        $reader->save();
+        return back()->with('success', 'Bank details updated successfully.');
     }
 
     public function logout(){
@@ -307,6 +337,7 @@ class ReaderController extends Controller
     public function assessmentTestFinalSubmit(Request $request, $id){
         try{
             $proofReaderTest = ProofReaderTest::find($id);
+            $proofReaderTest->auto_submit = $request->auto_submit;
             $proofReaderTest->submit_time = \Carbon\Carbon::now();
             $proofReaderTest->save();
 

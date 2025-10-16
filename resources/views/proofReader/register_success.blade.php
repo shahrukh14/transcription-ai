@@ -75,7 +75,7 @@
                                 </g>
                             </g>
                         </svg>
-                        <h2 class="brand-text text-primary ms-1">TranScribe</h2>
+                        <h2 class="brand-text text-primary ms-1">Hybrid</h2>
                     </a>
                     <div class="misc-inner p-2 p-sm-3">
                         <div class="w-100 text-center">

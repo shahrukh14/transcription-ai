@@ -19,4 +19,7 @@ class ProofReader extends Authenticatable
     public function tests(){
         return $this->hasMany(ProofReaderTest::class, 'user_id');
     }
+    protected $casts = [
+        'bank_details' => 'array',
+    ];
 }

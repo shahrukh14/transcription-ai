@@ -122,4 +122,52 @@ class ProofReaderAssessmentsController extends Controller
         }
         
     }
+
+    // EDIT Assesments
+    public function update(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:assessment_tests,id',
+            'name' => 'required|string|max:255',
+            'test_duration' => 'required|numeric',
+            'audio_language' => 'required|string',
+            'assessment_type' => 'required|numeric',
+            'status' => 'required|boolean',
+        ]);
+
+        $assessmentTest = AssessmentTest::find($request->id);
+
+        $assessmentTest->name = $request->name;
+        $assessmentTest->test_duration = $request->test_duration;
+        $assessmentTest->audio_language = $request->audio_language;
+        $assessmentTest->assessment_type = $request->assessment_type;
+        $assessmentTest->status = $request->status;
+
+        //Audio Update with audio-duration
+        if ($request->hasFile('audio')) {
+            $folderPath = public_path('admin/assessments/audios');
+            $originalName = pathinfo($request->audio->getClientOriginalName(), PATHINFO_FILENAME);
+            $cleanedName = str_replace('_', ' ', $originalName);
+            $audioName = Str::slug($originalName, '_') . '_' . date('Ymdhis') . '.' . $request->audio->getClientOriginalExtension();
+
+            $request->file('audio')->move($folderPath, $audioName);
+
+            // Delete old file if exists
+            if (File::exists($folderPath . '/' . $assessmentTest->audio_file)) {
+                File::delete($folderPath . '/' . $assessmentTest->audio_file);
+            }
+
+            // Get duration
+            $getID3 = new \getID3;
+            $fileInfo = $getID3->analyze($folderPath . '/' . $audioName);
+            $duration = isset($fileInfo['playtime_seconds']) ? round($fileInfo['playtime_seconds']) : 0;
+
+            $assessmentTest->audio_file = $audioName;
+            $assessmentTest->audio_file_original_name = $cleanedName;
+            $assessmentTest->audio_duration = $duration;
+        }
+
+        $assessmentTest->save();
+        return redirect()->back()->with('message', 'Assessment updated successfully!');
+    }
 }

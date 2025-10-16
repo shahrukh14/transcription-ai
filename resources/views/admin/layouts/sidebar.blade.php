@@ -31,65 +31,100 @@
             </li>
             @endcan
 
-            <li class="@if ((request()->is('admin/customers')) || (request()->is('admin/customers/add')) || (request()->is('admin/customers/edit'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.customers.list') }}">
-                    <i class="fa-solid fa-users"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Customers">@lang('Customers')</span>
+            <li class="nav-item 
+                @if (
+                    request()->is('admin/customers*') || 
+                    request()->is('admin/subscription*') || 
+                    request()->is('admin/transaction*')
+                ) active open @endif">
+                <a class="d-flex align-items-center" href="#">
+                    <i data-feather="users"></i>
+                    <span class="menu-title text-truncate font-size-12px">Customer</span>
                 </a>
+                <ul class="menu-content">
+                    <!-- Customers -->
+                    <li class="@if (request()->is('admin/customers') || request()->is('admin/customers/add') || request()->is('admin/customers/edit')) active @endif">
+                        <a class="d-flex align-items-center" href="{{ route('admin.customers.list') }}">
+                            <i class="fa-solid fa-users"></i>
+                            <span class="menu-title text-truncate font-size-12px">@lang('Customers')</span>
+                        </a>
+                    </li>
+
+                    <!-- Subscription -->
+                    <li class="@if (request()->is('admin/subscription') || request()->is('admin/subscription/list') || request()->is('admin/subscription/detail*')) active @endif">
+                        <a class="d-flex align-items-center" href="{{ route('admin.subscription.list') }}">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                            <span class="menu-title text-truncate font-size-12px">@lang('Subscription')</span>
+                        </a>
+                    </li>
+
+                    <!-- Transaction -->
+                    <li class="@if (request()->is('admin/transaction') || request()->is('admin/transaction/list') || request()->is('admin/transaction/detail*')) active @endif">
+                        <a class="d-flex align-items-center" href="{{ route('admin.transaction.list') }}">
+                            <i class="fa-solid fa-money-check-dollar"></i>
+                            <span class="menu-title text-truncate font-size-12px">@lang('Transaction')</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
 
-            <li class="@if ((request()->is('admin/proof-reader')) || (request()->is('admin/proof-reader/add')) || (request()->is('admin/proof-reader/edit'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.list') }}">
+            <li class="nav-item 
+                @if (
+                    request()->is('admin/proof-reader*') || 
+                    request()->is('admin/proof-reader/assessments*') || 
+                    request()->is('admin/proof-reader/recruitment*')
+                ) active open @endif">
+                <a class="d-flex align-items-center" href="#">
                     <i class="fa-solid fa-chalkboard-user"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Proof Readers">@lang('Proof Readers')</span>
+                    <span class="menu-title text-truncate font-size-12px">Proof Reader</span>
                 </a>
-            </li>
+                <ul class="menu-content">
+                    <!-- Proof Readers -->
+                    <li class="@if (request()->is('admin/proof-reader') || request()->is('admin/proof-reader/add') || request()->is('admin/proof-reader/edit')) active @endif">
+                        <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.list') }}">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                            <span class="menu-title text-truncate font-size-12px">@lang('Proof Readers')</span>
+                        </a>
+                    </li>
 
-            <li class="@if ((request()->is('admin/proof-reader/assessments')) || (request()->is('admin/proof-reader/assessments/add')) || (request()->is('admin/proof-reader/edit'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.assessments.list') }}">
-                    <i class="fa-solid fa-spell-check"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Assessments">@lang('Assessments')</span>
-                </a>
-            </li>
+                    <!-- Assessments -->
+                    <li class="@if (request()->is('admin/proof-reader/assessments*')) active @endif">
+                        <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.assessments.list') }}">
+                            <i class="fa-solid fa-spell-check"></i>
+                            <span class="menu-title text-truncate font-size-12px">@lang('Assessments')</span>
+                        </a>
+                    </li>
 
-            <li class="@if ((request()->is('admin/proof-reader/recruitment'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.recruitment.list') }}">
-                    <i class="fa-brands fa-hire-a-helper"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Recruitment">@lang('Recruitment')</span>
-                </a>
+                    <!-- Recruitments -->
+                    <li class="@if (request()->is('admin/proof-reader/recruitment*')) active @endif">
+                        <a class="d-flex align-items-center" href="{{ route('admin.proof-reader.recruitment.list') }}">
+                            <i class="fa-brands fa-hire-a-helper"></i>
+                            <span class="menu-title text-truncate font-size-12px">@lang('Recruitments')</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
-
-            <li class="@if ((request()->is('admin/package')) || (request()->is('admin/package/add')) || (request()->is('admin/package/edit'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.package.list') }}">
-                    <i class="fa-solid fa-cubes"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Packages">@lang('Packages')</span>
-                </a>
-            </li>
-            <li class="@if ((request()->is('admin/subscription')) || (request()->is('admin/subscription/list')) || (request()->is('admin/subscription/detail*'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.subscription.list') }}">
-                    <i class="fa-solid fa-dollar-sign"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="dollar-sign">@lang('subscription')</span>
-                </a>
-            </li>
+            
             <li class="@if ((request()->is('admin/transcription')) || (request()->is('admin/transcription/list'))|| (request()->is('admin/transcription/detail*'))) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('admin.transcription.list') }}">
                     <i class="fa-solid fa-microphone"></i>
                     <span class="menu-title text-truncate font-size-12px" data-i18n="dollar-sign">@lang('Transcription')</span>
                 </a>
             </li>
-            {{-- transaction --}}
-            <li class="@if ((request()->is('admin/transaction')) || (request()->is('admin/transaction/list'))|| (request()->is('admin/transaction/detail*'))) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.transaction.list') }}">
-                    <i class="fa-solid fa-money-check-dollar"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="dollar-sign">@lang('Transaction')</span>
-                </a>
-            </li>
+            
 
             {{-- proof-Reading --}}
             <li class="@if (request()->is('admin/proof-reading')) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('admin.proof-reading.list') }}">
                     <i class="fa-solid fa-file-lines"></i>
                     <span class="menu-title text-truncate font-size-12px" data-i18n="Proof Reading">@lang('Proof Reading')</span>
+                </a>
+            </li>
+
+            <li class="@if (request()->is('admin/proof-reading/invoice')) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('admin.proof-reading.invoice') }}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="Invoices">@lang('Invoice')</span>
                 </a>
             </li>
 
@@ -117,6 +152,13 @@
                         <a class="d-flex align-items-center" href="{{ route('admin.blog.list') }}">
                             <i data-feather="book"></i>
                             <span class="menu-title text-truncate font-size-12px" data-i18n="Blog">@lang('Blog')</span>
+                        </a>
+                    </li>
+
+                    <li class="@if ((request()->is('admin/package')) || (request()->is('admin/package/add')) || (request()->is('admin/package/edit'))) active @endif nav-item">
+                        <a class="d-flex align-items-center" href="{{ route('admin.package.list') }}">
+                            <i class="fa-solid fa-cubes"></i>
+                            <span class="menu-title text-truncate font-size-12px" data-i18n="Packages">@lang('Packages')</span>
                         </a>
                     </li>
 

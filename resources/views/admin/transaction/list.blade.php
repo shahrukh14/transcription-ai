@@ -53,7 +53,7 @@
                                                     <tr>
                                                         <td class="text-nowrap">{{ $transaction->id }}</td>
                                                         <td class="text-nowrap">{{ $transaction->user->fullname() }}</td>
-                                                        <td class="text-nowrap">{{ $transaction->package->name }}</td>
+                                                        <td class="text-nowrap">{{ $transaction->package->name ?? ''}}</td>
                                                         <td class="text-nowrap">{{ date('d-m-Y , h:i A', strtotime($transaction->created_at)) }}</td>
                                                         <td class="text-nowrap">{{ $transaction->payment_id }}</td>
                                                         <td class="text-nowrap">{{ $transaction->order_id }}</td>

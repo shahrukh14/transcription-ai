@@ -191,12 +191,22 @@ class UserController extends Controller
         }else{
             $imageName = $users->image;
         }
+        // store company address as JSON
+        $companyAddress = [
+            'address' => $request->address,
+            'city' => $request->city,
+            'state' => $request->state,
+            'pin' => $request->pin,
+        ];
         $users->first_name =  $request->first_name;
         $users->last_name  =  $request->last_name;
         $users->email      =  $request->email;
         $users->mobile     =  $request->mobile;
         $users->image     =  $imageName;
         $users->password  =  $password;
+        $users->company_name = $request->company_name;
+        $users->gst = $request->gst;
+        $users->company_address = json_encode($companyAddress);
         $users->save();
         alert()->success('success', 'Profile Updated Sucessfully');
         return redirect()->route('user.dashboard');

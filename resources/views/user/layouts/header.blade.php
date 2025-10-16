@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="loading" lang="en" data-textdirection="ltr">
 <!-- BEGIN: Head-->
-
+@php  $generalsettings = App\Models\Generalsettings::first(); @endphp
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -101,7 +101,13 @@
                 </li>
             </ul>
         </div>
+        
         <div class="navbar-container d-flex content">
+            <div class="bookmark-wrapper d-flex align-items-center">
+                <a class="navbar-brand" href="{{route('home')}}"><span class="brand-logo">
+                    <img src="{{asset('/admin/generalSetting/'.$generalsettings->logo)}}" alt="Logo" width="120">
+                </a>
+            </div>
             @auth
             <ul class="nav navbar-nav align-items-center ms-auto">
                 <li class="nav-item d-none d-lg-block">

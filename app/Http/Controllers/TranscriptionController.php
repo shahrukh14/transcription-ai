@@ -27,28 +27,49 @@ class TranscriptionController extends Controller
             $folderPath = public_path('user/audios');
             File::ensureDirectoryExists($folderPath);
 
-            if (!$request->hasFile('audio')) {
-                return response()->json(['error' => true, 'message' => 'No file found.']);
+            // Dropzone chunked upload params
+            $chunkIndex = $request->input('dzchunkindex'); // current chunk number (starts at 0)
+            $totalChunks = $request->input('dztotalchunkcount'); // total number of chunks
+            $fileName = $request->input('dzuuid') . '.' . $request->file('audio')->getClientOriginalExtension(); // unique filename per upload
+            $chunkFile = $folderPath . '/' . $fileName . '.part' . $chunkIndex;
+
+            // Save current chunk
+            $request->file('audio')->move($folderPath, basename($chunkFile));
+
+            // If not last chunk, just return success
+            if ($chunkIndex < $totalChunks - 1) {
+                return response()->json(['success' => true, 'chunk' => $chunkIndex]);
             }
 
-            $file = $request->file('audio');
-            $mime = $file->getMimeType();
+            // Last chunk -> merge all parts
+            $finalPath = $folderPath . '/' . $fileName;
+            $fp = fopen($finalPath, 'ab'); // append binary
+            for ($i = 0; $i < $totalChunks; $i++) {
+                $partPath = $folderPath . '/' . $fileName . '.part' . $i;
+                $chunkData = file_get_contents($partPath);
+                fwrite($fp, $chunkData);
+                File::delete($partPath); // delete chunk after merge
+            }
+            fclose($fp);
+
+            // ---------- Now continue with your FFmpeg + DB logic ----------
+            $uploadedPath = $finalPath;
+
+            $mime = mime_content_type($uploadedPath);
             $isVideo = str_starts_with($mime, 'video/');
             $isAudio = str_starts_with($mime, 'audio/');
 
             if (!$isAudio && !$isVideo) {
+                File::delete($uploadedPath);
                 return response()->json(['error' => true, 'message' => 'Only audio or video files are allowed.']);
             }
 
             $audio_code   = strtoupper(Str::random(10));
-            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $originalName = pathinfo($request->file('audio')->getClientOriginalName(), PATHINFO_FILENAME);
             $cleanedName  = str_replace('_', ' ', $originalName);
             $timestamp    = now()->format('YmdHis');
-            $extension    = $file->getClientOriginalExtension();
+            $extension    = pathinfo($uploadedPath, PATHINFO_EXTENSION);
             $baseName     = Str::slug($originalName, '_') . '_' . $timestamp;
-
-            $uploadedPath = $folderPath . '/' . $baseName . '.' . $extension;
-            $file->move($folderPath, $baseName . '.' . $extension);
 
             $audioSourcePath = $uploadedPath;
 
@@ -64,8 +85,7 @@ class TranscriptionController extends Controller
                     return response()->json(['error' => true, 'message' => 'Failed to extract audio from video.']);
                 }
 
-                // Delete original video after extracting audio
-                File::delete($uploadedPath);
+                File::delete($uploadedPath); // delete merged video
                 $audioSourcePath = $extractedPath;
             }
 
@@ -79,8 +99,7 @@ class TranscriptionController extends Controller
                 return response()->json(['error' => true, 'message' => 'Failed to compress audio.']);
             }
 
-            // Delete source (extracted or original audio)
-            File::delete($audioSourcePath);
+            File::delete($audioSourcePath); // delete temp audio
 
             // Analyze duration
             $getID3 = new \getID3;
@@ -92,7 +111,7 @@ class TranscriptionController extends Controller
                 return response()->json(['error' => true, 'message' => "getID3 failed to get duration."]);
             }
 
-            // Subscription Check
+            // Subscription check
             $language = $request->language;
             $speakers = $request->speakers;
             $transcribeToEnglish = $request->transcribe_to_english;
@@ -138,6 +157,7 @@ class TranscriptionController extends Controller
             return response()->json(['error' => true, 'message' => $ex->getMessage()]);
         }
     }
+
 
 
     public function renderTranscriptionTable(){
@@ -268,8 +288,10 @@ class TranscriptionController extends Controller
         foreach(json_decode($transcription_segments)??[] as $segment){
             if (!isset($allSpeakers[$segment->speaker])) {
                 $allSpeakers[$segment->speaker] = $segment->speaker_name ?? 'Speaker ' . $speakerCounter++;
+
             }
         }
+
         $proofreadingOnprogress = auth()->user()->proofReadings()->where('tasks.status', 'Claimed')->where('tasks.payment', 'Pending')->get();
         return view('user.transcription_view', compact('transcription','allSpeakers','proofreadingOnprogress'));
     }
@@ -429,7 +451,12 @@ class TranscriptionController extends Controller
 
                 // Build speaker + timestamp line if applicable
                 if ($request->speaker == "true") {
-                    $line .= $speakerMap[$segment->speaker];
+                    if(isset($segment->speaker_name)){
+                        $speaker = $segment->speaker_name;
+                    }else{
+                        $speaker = $speakerMap[$segment->speaker];
+                    }
+                    $line .= $speaker;
                 }
 
                 if ($request->timestamp == "true") {

@@ -25,5 +25,11 @@ class Task extends Model
     {
         return $this->belongsTo(ProofReader::class, 'claimed_by', 'id');
     }
+
+
+    public function claimRecord()
+    {
+        return $this->hasMany(TaskClaimRecord::class, 'task_id');
+    }
 }
 

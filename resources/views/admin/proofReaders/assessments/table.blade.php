@@ -52,6 +52,20 @@
                     <span class="badge rounded-pill badge-light-danger me-1">Inactive</span>
                 @endif
             </td>
+            <td>
+                <button type="button" 
+                    class="btn btn-sm btn-outline-primary editBtn"
+                    data-id="{{ $test->id }}"
+                    data-name="{{ $test->name }}"
+                    data-audio_language="{{ $test->audio_language }}"
+                    data-test_duration="{{ $test->test_duration }}"
+                    data-assessment_type="{{ $test->assessment_type }}"
+                    data-status="{{ $test->status }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editTestModal">
+                    <i class="fa fa-edit"></i>
+                </button>
+            </td>
         </tr>
     @endforeach
 @else

@@ -41,16 +41,16 @@
                             </div>
                             <div class="col-md-6 mb-1">
                                 <label for="email" class="form-label">@lang('E-mail')<span class="text-danger">*</span></label>
-                                <input type="email" class="form-control" placeholder="@lang('Enter email address')" name="email" id="email" value="{{$user->email}}" required>
+                                <input type="email" class="form-control" placeholder="@lang('Enter email address')" name="email" id="email" value="{{$user->email}}" required readonly>
                             </div>
                             <div class="col-md-6 mb-1">
                                 <label for="mobile" class="form-label">@lang('Mobile')<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" placeholder="@lang('Enter mobile number')" name="mobile" id="mobile"  value="{{$user->mobile}}"  required>
                             </div>
-                            <div class="col-md-6 mb-1">
+                            {{-- <div class="col-md-6 mb-1">
                                 <label for="sso_google_id" class="form-label">@lang('Google Login ID')</label>
                                 <input type="text" class="form-control" placeholder="@lang('Enter google ID for login with google')" name="sso_google_id" id="sso_google_id"  value="{{$user->sso_google_id}}">
-                            </div>
+                            </div> --}}
                             <div class="col-md-6 mb-1">
                                 <label for="image" class="form-label">@lang('Profile Picture')</label>
                                 <input type="file" class="form-control" name="image" id="image">

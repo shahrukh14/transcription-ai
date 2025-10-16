@@ -61,6 +61,7 @@
                                     @csrf
                                     <div class="row">
                                         <div class="col-md-12 mt-1">
+                                            <input type="hidden" name="auto_submit" id="auto_submit" value="0">
                                             <button type="submit" class="btn btn-outline-success w-100">Final Sumbit</button>
                                         </div>
                                     </div>
@@ -166,6 +167,7 @@ $(document).ready(function () {
         if (diff <= 0) {
             clearInterval(timerInterval);
             $('.timerRunning').text('00:00:00');
+            $('#auto_submit').val(1);
             $('#finalSubmitForm').submit();
             return;
         }

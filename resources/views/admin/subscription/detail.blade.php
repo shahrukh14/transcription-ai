@@ -51,12 +51,38 @@
                             
                                     <div class="col-md-8 mt-2">
                                         <label class="form-label">Email</label>
-                                        <p class="mt-1">{{ $detail->getUser->email ?? 'N/A' }}</p>
+                                        <p class="">{{ $detail->getUser->email ?? 'N/A' }}</p>
                                     </div>
                             
                                     <div class="col-md-4 mt-2">
                                         <label class="form-label">Phone</label>
-                                        <p class="mt-1">{{ $detail->getUser->mobile ?? 'N/A' }}</p>
+                                        <p class="">{{ $detail->getUser->mobile ?? 'N/A' }}</p>
+                                    </div>
+
+                                    <div class="col-md-8 mt-2">
+                                        <label class="form-label">Company Name</label>
+                                        <p class="">{{ $detail->getUser->company_name ?? 'N/A' }}</p>
+                                    </div>
+
+                                    <div class="col-md-4 mt-2">
+                                        <label class="form-label">GST</label>
+                                        <p class="">{{ $detail->getUser->gst ?? 'N/A' }}</p>
+                                    </div>
+
+                                    <div class="col-md-12 mt-2">
+                                        <label class="form-label">Company Address</label>
+                                        @php
+                                            $companyAddress = json_decode($detail->getUser->company_address);
+                                        @endphp
+                                        @if ($companyAddress)
+                                            <p>
+                                                {{ $companyAddress->address ?? '' }}{{ $companyAddress->city ? ', '.$companyAddress->city : '' }}
+                                                {{ $companyAddress->state ? ', '.$companyAddress->state : '' }}
+                                                {{ $companyAddress->pin ? ' - '.$companyAddress->pin : '' }}
+                                            </p>
+                                        @else
+                                            <p>N/A</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

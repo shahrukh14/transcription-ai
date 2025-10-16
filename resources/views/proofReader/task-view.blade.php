@@ -14,7 +14,7 @@
             @endif
             <div class="content-body">
                 <div class="row">
-                    <div @if($task->status != null && $task->claimed_by == auth()->guard('reader')->user()->id) class="col-xl-9 col-md-9 col-6" @else class="col-xl-12 col-md-12 col-6" @endif>
+                    <div  class="col-xl-9 col-md-9 col-6">
                         <div class="card w-100 mb-4">
                             <div class="card-header d-flex justify-content-between pb-0">
                                 <h4 class="card-title">
@@ -92,7 +92,7 @@
                             </div>
                         </div>
                     </div>
-                    @if($task->status != null && $task->claimed_by == auth()->guard('reader')->user()->id) 
+                    
                     <div class="col-xl-3 col-md-3 col-3">
                         @if ($task->status == "Claimed")
                         <div class="card">
@@ -102,12 +102,32 @@
                                 </div>
                             </div>
                         </div>
+                        @else
+                            <div class="card">
+                                <div class="card-body">
+                                    @php
+                                        $minutes = $task->proof_reading_time_duration;
+                                        $hours = intdiv($minutes, 60); 
+                                        $remainingMinutes = $minutes % 60;
+                                    @endphp
+                                    <div>
+                                        <span class="fw-bolder h4"> Proof reading Time : {{ $hours ? $hours .' hr '.$remainingMinutes . " mins" : $remainingMinutes . " mins"}}</span>
+                                    </div>
+                                </div>
+                            </div>
                         @endif
                         
                         <div class="card">
                             <div class="card-body">
                                 <div>
                                     <span class="fw-bolder h4">Proof Reading Cost : ₹ {{number_format($task->price,2)}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div>
+                                    <span class="fw-bolder h4">Audio Language : {{ucfirst($task->transcription->language)}}</span>
                                 </div>
                             </div>
                         </div>
@@ -137,7 +157,7 @@
                                     </li>
                                 </ul>
 
-                                @if($task->attachment != null)
+                                @if($task->attachment != null && !empty(json_decode($task->attachment)))
                                 <h4 class="mb-1">Attachments</h4>
                                 <div class="row">
                                     @foreach (json_decode($task->attachment) as $attachment)
@@ -167,13 +187,18 @@
                                 </div>
                             </div>
                         </div>
-                        @if($task->status == "Completed")
+                        @if($task->status != null && $task->claimed_by == auth()->guard('reader')->user()->id)
+                            <a href="{{ route('proof-reader.tasks.mark-as-complete', ['id' => $task->id]) }}"  class="btn btn-success w-100"> Mark as complete </a>
+                        @elseif($task->status == "Completed")
                             <button type="button" class="btn btn-success w-100" disabled> Completed </button>
                         @else
-                            <a href="{{ route('proof-reader.tasks.mark-as-complete', ['id' => $task->id]) }}"  class="btn btn-success w-100"> Mark as complete </a>
+                            <form action="{{ route('proof-reader.tasks.claimed.by.proof.reader', ['id' => $task->id]) }}">
+                                <input type="hidden" name="status" value="Claimed">
+                                <button type="submit" class="btn btn-primary w-100"> Claim </button>
+                            </form>
                         @endif
+
                     </div>
-                    @endif
                 </div>   
             </div>
         </div>

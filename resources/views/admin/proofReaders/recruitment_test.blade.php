@@ -58,6 +58,15 @@
                 <div class="col-xl-3 col-md-3 col-3">
                     <div class="card">
                         <div class="card-body">
+                            @if($test->auto_submit)
+                                <h4> Auto Submitted By Timer</h4>
+                            @else
+                                <h4> Submitted By Proof reader</h4>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
                             <a href="{{route('admin.proof-reader.recruitment.test.approve', $test->id)}}" class="btn btn-outline-success w-100 mb-1">Approve</a>
                             <a href="{{route('admin.proof-reader.recruitment.test.re.do', $test->id)}}" class="btn btn-outline-warning w-100 mb-1">Re-Do</a>
                             <a href="{{route('admin.proof-reader.recruitment.test.reject', $test->id)}}" class="btn btn-outline-danger w-100">Reject</a>

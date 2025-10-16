@@ -24,7 +24,11 @@
     @foreach (json_decode($transcription->transcription_segments)??[] as $segment)
         @php
             if (!isset($speakerMap[$segment->speaker])) {
-                $speakerMap[$segment->speaker] = 'Speaker ' . $speakerCounter++;
+                if(isset($segment->speaker_name)){
+                    $speakerMap[$segment->speaker] = $segment->speaker_name;
+                }else{
+                    $speakerMap[$segment->speaker] = 'Speaker ' . $speakerCounter++;
+                }
             }
             $timeInSeconds  = $segment->start;
             $minutes        = floor($timeInSeconds / 60);

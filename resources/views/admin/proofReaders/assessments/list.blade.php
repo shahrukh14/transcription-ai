@@ -54,6 +54,7 @@
                                                 <th class="text-nowrap">@lang('Test Duration')</th>
                                                 <th class="text-nowrap">@lang('Created At')</th>
                                                 <th class="text-nowrap">@lang('Status')</th>
+                                                <th class="text-nowrap">@lang('Action')</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tableBody"></tbody>
@@ -120,8 +121,66 @@
         </div>
     </div>
 </div>
-
 <!-- Add test Modal End-->
+
+<!-- Edit test Modal Start-->
+<div class="modal fade" id="editTestModal" tabindex="-1" aria-labelledby="editTestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form action="{{ route('admin.proof-reader.assessments.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" id="edit_id" name="id">
+                <div class="modal-header">
+                    <h4 class="modal-title text-center" id="editTestModalLabel">Edit Assessment Test</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-1">
+                            <label for="edit_name" class="form-label">Name</label><span class="text-danger">*</span>
+                            <input class="form-control" type="text" id="edit_name" name="name" required />
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label for="edit_audio" class="form-label">Audio</label>
+                            <input class="form-control" type="file" id="edit_audio" name="audio" accept=".mp3, .wav, .flac, .aac, .opus, .ogg, .m4a, .mp4, .mpeg, .mov, .webm"/>
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label for="edit_test_duration" class="form-label">Test Duration (in minute)</label><span class="text-danger">*</span>
+                            <input class="form-control" type="number" id="edit_test_duration" name="test_duration" required />
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label class="form-label" for="edit_audio_language">Audio Language</label><span class="text-danger">*</span>
+                            <select class="form-select" id="edit_audio_language" name="audio_language" required>
+                                <option selected disabled>Select Language</option>
+                                @foreach ($languages as $language)
+                                    <option value="{{ $language }}">{{ ucfirst($language) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label class="form-label" for="edit_assessment_type">Audio for which assessment</label><span class="text-danger">*</span>
+                            <select class="form-select" id="edit_assessment_type" name="assessment_type" required>
+                                <option value="1">Assessment 1</option>
+                                <option value="2">Assessment 2</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-1">
+                            <label class="form-label" for="edit_status">Status</label>
+                            <select class="form-select" id="edit_status" name="status">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Edit test Modal End-->
 @endpush
 
 @push('script')
@@ -150,6 +209,17 @@
                 }
             });
         }
+    });
+
+    // EDIT FUNCTION
+    $(document).on('click', '.editBtn', function () {
+        let button = $(this);
+        $('#edit_id').val(button.data('id'));
+        $('#edit_name').val(button.data('name'));
+        $('#edit_audio_language').val(button.data('audio_language'));
+        $('#edit_test_duration').val(button.data('test_duration'));
+        $('#edit_assessment_type').val(button.data('assessment_type'));
+        $('#edit_status').val(button.data('status'));
     });
 </script>
 @endpush

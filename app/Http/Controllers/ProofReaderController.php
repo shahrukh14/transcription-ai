@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Exception;
 use App\Models\ProofReader;
 use Illuminate\Http\Request;
@@ -56,7 +57,8 @@ class ProofReaderController extends Controller
 
     public function edit($id){
         $proofReader = ProofReader::find($id);
-        return view('admin.proofReaders.edit', compact('proofReader'));
+        $languages = DB::table('languages')->orderBy('name', 'ASC')->pluck('name')->toArray();
+        return view('admin.proofReaders.edit', compact('proofReader','languages'));
     }
 
     public function update(Request $request, $id){
@@ -74,12 +76,26 @@ class ProofReaderController extends Controller
             }else{
                 $imageName = $proofReader->image;
             }
-
+            //password
+            if($request->password != ""){
+                $password = Hash::make($request->password);
+            }else{
+                $password = $proofReader->password;
+            }
+            
             $proofReader->first_name       = $request->first_name;
             $proofReader->last_name        = $request->last_name;
             $proofReader->email            = $request->email;
             $proofReader->mobile           = $request->mobile;
+            $proofReader->password         = $password;
             $proofReader->image            = $imageName;
+            $proofReader->typing_speed     = $request->typing_speed;
+            $proofReader->work_hours       = $request->work_hours;
+            $proofReader->city             = $request->city;
+            $proofReader->state            = $request->state;
+            if ($request->has('language_known')) {
+                $proofReader->language_known = json_encode($request->language_known);
+            }
             $proofReader->save();
             alert()->success('Success', 'Proof Reader updated Successfully');
             return redirect()->route('admin.proof-reader.list');

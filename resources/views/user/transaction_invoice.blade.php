@@ -98,7 +98,7 @@
     <div class="header">
       <div class="logo">
         <img src="https://cdn-icons-png.flaticon.com/512/5968/5968705.png" alt="Logo">
-        <h1>TranScribe</h1>
+        <h1>Hybrid</h1>
       </div>
       <div class="invoice-details text-left">
         <p>Order ID : <strong>{{$transaction->order_id}}</strong></p>

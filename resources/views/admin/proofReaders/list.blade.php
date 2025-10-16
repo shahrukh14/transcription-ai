@@ -32,7 +32,7 @@
                         @endif
                         <div class="card">
                             <div class="card-header border-bottom">
-                                <a href="{{route('admin.proof-reader.add')}}" class="btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0">
+                                {{-- <a href="{{route('admin.proof-reader.add')}}" class="btn btn-primary" tabindex="0" aria-controls="DataTables_Table_0">
                                     <span>
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus me-50 font-small-4">
                                             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -40,8 +40,8 @@
                                         </svg>
                                         Add New Proof Reader
                                     </span>
-                                </a>
-                                <form action="" method="GET" class="d-flex ms-3">
+                                </a> --}}
+                                <form action="" method="GET" class="d-flex ms-auto">
                                     <input type="text" name="search" id="search" class="form-control" value="{{$search}}" placeholder="Search Title">
                                     <button type="submit" class="btn btn-primary ms-1"><i class="fa fa-search"></i></button>
                                     <a href="{{route('admin.proof-reader.list')}}" class="btn btn-primary ms-1"><i class="fa-solid fa-rotate-right"></i></a>

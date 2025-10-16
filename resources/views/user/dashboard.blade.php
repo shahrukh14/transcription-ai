@@ -62,7 +62,7 @@
                         </div><hr>
                         <div class="card-body">
                             <div class="text-center p-1">
-                                <h2 class="mb-1">Welcome to TranScribe</h2>
+                                <h2 class="mb-1">Welcome to Hybrid</h2>
                                 <button type="button" class="btn btn-primary p-2 w-25 fw-bolder" data-bs-toggle="modal" data-bs-target="#dropZoneModal">
                                     <i class="fa-solid fa-cloud-arrow-up"></i> Transcribe Your File
                                 </button>
@@ -316,28 +316,35 @@ $(document).ready(function () {
 
     if (uploadUrl) {
         audioDropzone = new Dropzone("#audioDropzone", {
-            url: uploadUrl, // Use the dynamic URL
-            paramName: "audio", // Name of the file in request
+            url: uploadUrl, // Dynamic URL
+            paramName: "audio", // File field name
             maxFiles: 1,
-            maxFilesize: 5120, // Max file size = 5 GB
+            maxFilesize: 5120, // 5 GB max
             acceptedFiles: ".mp3,.wav,.flac,.aac,.opus,.ogg,.m4a,.mp4,.mpeg,.mov,.webm",
             addRemoveLinks: true,
-            autoProcessQueue: false, // Prevent automatic upload
+            autoProcessQueue: false,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
+
+            // ⚡ Enable chunked uploads
+            chunking: true,
+            forceChunking: true,
+            chunkSize: 10 * 1024 * 1024, // 10 MB chunks
+            parallelChunkUploads: false,
+            retryChunks: true,
+            retryChunksLimit: 3,
+
             init: function () {
                 let dz = this;
 
-                // When file is added
                 this.on("addedfile", function (file) {
                     console.log("File added:", file.name);
                 });
 
-                // Handle successful upload
                 this.on("success", function (file, response) {
                     if (response.success) {
-                        dz.removeAllFiles(); // Clear after successful upload
+                        dz.removeAllFiles();
                         $('#dropZoneModal').modal('hide');
                         $('.modal-backdrop').removeClass('show');
                         Swal.fire({
@@ -356,7 +363,6 @@ $(document).ready(function () {
                     }
                 });
 
-                // Handle errors
                 this.on("error", function (file, errorMessage) {
                     Swal.fire({
                         title: "Error!",
@@ -365,7 +371,13 @@ $(document).ready(function () {
                     });
                 });
 
-                // Upload button click event
+                // Progress bar for chunks
+                this.on("uploadprogress", function (file, progress) {
+                    $('.progress-bar').css('width', progress + '%');
+                    $('.progress-bar').text(Math.round(progress) + '%');
+                });
+
+                // Upload button
                 $('#uploadBtn').on('click', function () {
                     if (dz.getQueuedFiles().length === 0) {
                         Swal.fire({
@@ -376,13 +388,9 @@ $(document).ready(function () {
                         return;
                     }
 
-                    // Validate language and speakers
                     let language = $('.languageSelect').val();
                     let speakers = $('#speakers').val();
-                    let transcribeToEnglish = 0;
-                    if ($('#transcribe_to_english').is(':checked')){
-                        transcribeToEnglish = 1;
-                    }
+                    let transcribeToEnglish = $('#transcribe_to_english').is(':checked') ? 1 : 0;
 
                     if (!language || !speakers) {
                         Swal.fire({
@@ -393,23 +401,12 @@ $(document).ready(function () {
                         return;
                     }
 
-                    // Append additional data
                     dz.on("sending", function (file, xhr, formData) {
                         formData.append("language", language);
                         formData.append("speakers", speakers);
                         formData.append("transcribe_to_english", transcribeToEnglish);
-
-                        // Handle real-time progress
-                        xhr.upload.onprogress = function (e) {
-                            if (e.lengthComputable) {
-                                let progress = Math.round((e.loaded / e.total) * 100);
-                                $('.progress-bar').css('width', progress + '%');
-                                $('.progress-bar').text(progress + '%');
-                            }
-                        };
                     });
 
-                    // Start uploading
                     dz.processQueue();
                 });
             }
@@ -421,6 +418,7 @@ $(document).ready(function () {
             icon: "error"
         });
     }
+
 
     function renderTranscriptionTable(){
         $.ajax({

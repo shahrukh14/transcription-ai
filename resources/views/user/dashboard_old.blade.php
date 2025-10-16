@@ -52,7 +52,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="text-center p-4">
-                                    <h4 class="card-title">Welcome to TranScribe</h4>
+                                    <h4 class="card-title">Welcome to Hybrid</h4>
                                     <button type="button" class="rts-btn btn__long primary__bg white__color mt-2" data-bs-toggle="modal" data-bs-target="#dropZoneModal" style="width: 35%;">
                                         <i class="fa-solid fa-cloud-arrow-up"></i>Transcribe Your First File
                                     </button>

@@ -69,6 +69,13 @@ class TaskController extends Controller
     public function claimedByProofReader(Request $request, $id)
     {
         try {
+            //check if already have a claimed task
+            $claimedTask = Task::where('claimed_by', Auth::guard('reader')->user()->id)->where('status', 'Claimed')->get();
+            if($claimedTask->count() > 0){
+                alert()->warning('Error', "You already have a claimed task, You need to complete that before claiming another task.");
+                return redirect()->back();
+            }
+
             $task = Task::findOrFail($id);
             if($request->status == 'Claimed'){
                 $task->claimed_by = Auth::guard('reader')->user()->id;
@@ -101,7 +108,7 @@ class TaskController extends Controller
             alert()->success('success', 'You ' . $request->status . ' the task!');
             return redirect()->back();
         } catch (\Exception $ex) {
-            alert()->success('error', $ex->getMessage());
+            alert()->error('error', $ex->getMessage());
             return redirect()->back();
         }
     }

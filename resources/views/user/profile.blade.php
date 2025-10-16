@@ -10,7 +10,7 @@
                 <div class="content-header-left col-md-9 col-12 mb-2">
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">Profile</h2>
+                            <h2 class="content-header-title float-start mb-0">Profilesss</h2>
                         </div>
                     </div>
                 </div>
@@ -25,6 +25,9 @@
                     {{ Session::get('error') }}
                 </p>
             @endif
+            @php
+                $companyAddress = json_decode($users->company_address);
+            @endphp
             <div class="content-body">
                 <section id="input-file-browser">
                     <div class="card">
@@ -82,6 +85,67 @@
                                         <div class="mb-1">
                                             <label for="image" class="form-label">Profile pic</label>
                                             <input class="form-control" type="file" name="image" id="image" >
+                                        </div>
+                                    </div>
+                                </div>
+                                {{--  --}}
+                                <div class="row">
+                                    <div class="col-12 col-sm-6 col-md-6 mb-1">
+                                        <label class="form-label" for="">Company Name</label>
+                                        <div class="input-group form-password-toggle ">
+                                            <input class="form-control" type="text" id="company_name" name="company_name" value="{{ old('company_name', $users->company_name) }}" required />
+                                            @error('company_name')
+                                                <small class="-mt-3 text-red-500">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-6 mb-1">
+                                        <label class="form-label" for="">GST</label>
+                                        <div class="input-group form-password-toggle ">
+                                            <input class="form-control" type="text" id="gst" name="gst" value="{{ old('gst', $users->gst) }}" required />
+                                            @error('gst')
+                                                <small class="-mt-3 text-red-500">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-sm-6 col-md-6 mb-1">
+                                        <label class="form-label" for="">Address</label>
+                                        <div class="input-group form-password-toggle ">
+                                            <input class="form-control" type="text" id="address" name="address" value="{{ $companyAddress->address ?? '' }}" required />
+                                            @error('address')
+                                                <small class="-mt-3 text-red-500">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-6 mb-1">
+                                        <label class="form-label" for="">City</label>
+                                        <div class="input-group form-password-toggle ">
+                                            <input class="form-control" type="text" id="city" name="city" value="{{ $companyAddress->city ?? '' }}" required />
+                                            @error('city')
+                                                <small class="-mt-3 text-red-500">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-sm-6 col-md-6 mb-1">
+                                        <label class="form-label" for="">State</label>
+                                        <div class="input-group form-password-toggle ">
+                                            <input class="form-control" type="text" id="state" name="state" value="{{ $companyAddress->state ?? '' }}" required />
+                                            @error('state')
+                                                <small class="-mt-3 text-red-500">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-6 mb-1">
+                                        <label class="form-label" for="">Pin </label>
+                                        <div class="input-group form-password-toggle ">
+                                            <input class="form-control" type="text" id="pin" name="pin" value="{{ $companyAddress->pin ?? '' }}" required />
+                                            @error('pin')
+                                                <small class="-mt-3 text-red-500">{{ $message }}</small>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>

@@ -78,7 +78,7 @@
                                     </g>
                                 </g>
                             </svg>
-                            <h2 class="brand-text text-primary ms-1">TranScribe</h2>
+                            <h2 class="brand-text text-primary ms-1">Hybrid</h2>
                         </a>
                         <!-- /Brand logo-->
                         <!-- Left Text-->

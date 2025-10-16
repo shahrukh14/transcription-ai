@@ -56,6 +56,9 @@
                                                 <th>@lang('Uploaded at')</th>
                                                 <th>@lang('Duration')</th>
                                                 <th>@lang('Language')</th>
+                                                <th>@lang('User Name')</th>
+                                                <th>@lang('Company Name')</th>
+                                                <th>@lang('Subscription Package')</th>
                                                 <th>@lang('Status')</th>
                                             </tr>
                                         </thead>
@@ -78,6 +81,9 @@
                                                         <td>{{date('d M Y, h:i A', strtotime($transcription->created_at))}} </td>
                                                         <td>{{ $duration }} </td>
                                                         <td>{{ ucfirst($transcription->language) }}</td>
+                                                        <td>{{ $transcription->getUserName->first_name ?? '' }} {{ $transcription->getUserName->last_name ?? '' }}</td>
+                                                        <td>{{ $transcription->getUserName->company_name ?? 'N/A' }}</td>
+                                                        <td>{{ $transcription->getPackage->name ?? 'N/A' }}</td>
                                                         <td>
                                                             @if($transcription->status == 0)
                                                                 <span class="badge rounded-pill badge-light-secondary me-1">Untranscribed</span>

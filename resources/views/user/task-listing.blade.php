@@ -35,7 +35,6 @@
                                             <th class="text-nowrap">@lang('Audio')</th>
                                             <th class="text-nowrap">@lang('Uploaded At')</th>
                                             <th class="text-nowrap">@lang('Status')</th>
-                                            <th class="text-nowrap">@lang('Claimed By')</th>
                                             <th class="text-nowrap">@lang('Claimed At')</th>
                                             <th class="text-nowrap">@lang('Complete At')</th>
                                             <th class="text-nowrap">@lang('Action')</th>
@@ -62,18 +61,11 @@
                                                     @if ($transcription->tasksStatus == "Completed")
                                                         <span class="badge rounded-pill badge-light-success me-1">Completed</span>
                                                     @elseif($transcription->tasksStatus == "Claimed")
-                                                        <span class="badge rounded-pill badge-light-warning me-1">Claimed</span>
+                                                        <span class="badge rounded-pill badge-light-warning me-1">In Progress</span>
                                                     @elseif($transcription->tasksStatus == "Unclaimed")
                                                         <span class="badge rounded-pill badge-light-danger me-1">Unclaimed</span>
                                                     @elseif($transcription->tasksStatus == "Cancelled")
                                                         <span class="badge rounded-pill badge-light-danger me-1">Cancelled</span>
-                                                    @else
-                                                        <span class="badge rounded-pill badge-light-secondary me-1">Not Claimed</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($transcription->tasksStatus == "Claimed" && $task->claimed_by != null)
-                                                        {{$task->proofReader->fullName()}}
                                                     @else
                                                         <span class="badge rounded-pill badge-light-secondary me-1">Not Claimed</span>
                                                     @endif

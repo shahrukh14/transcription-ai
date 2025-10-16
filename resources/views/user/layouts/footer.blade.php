@@ -7,9 +7,9 @@
             <div class="row">
                 <!-- About section -->
                 <div class="col-12 col-md-4 mb-2 mb-md-0">
-                    <h5 class="fw-bold mb-1">About TranScribe</h5>
+                    <h5 class="fw-bold mb-1">About Hybrid</h5>
                     <p class="text-muted">
-                        TranScribe helps you easily transcribe, manage and organize your audio recordings into clear written content.
+                        Hybrid helps you easily transcribe, manage and organize your audio recordings into clear written content.
                     </p>
                 </div>
     
@@ -27,8 +27,7 @@
                 <div class="col-6 col-md-4">
                     <h5 class="fw-bold mb-1">Contact</h5>
                     <ul class="list-unstyled">
-                        <li class="text-muted">Email: support@transcribe.com</li>
-                        <li class="text-muted">Phone: +91 9876543210</li>
+                        <li class="text-muted">Email: support@hybrid.com</li>
                         <li class="text-muted">Address: India</li>
                     </ul>
                 </div>
@@ -39,7 +38,7 @@
             <div class="d-flex justify-content-between flex-wrap">
                 <p class="mb-0 text-muted">
                     COPYRIGHT &copy; {{ date('Y') }}
-                    <a class="ms-25 fw-bold text-decoration-none" href="{{ route('home') }}">TranScribe</a>,
+                    <a class="ms-25 fw-bold text-decoration-none" href="{{ route('home') }}">Hybrid</a>,
                     All rights Reserved
                 </p>
     

@@ -30,7 +30,7 @@
                                     </g>
                                 </svg>
                             </span>
-                            <h2 class="brand-text mb-0">TranScribe</h2>
+                            <h2 class="brand-text mb-0">Hybrid</h2>
                         </a>
                     </li>
                     <li class="nav-item nav-toggle">

@@ -187,6 +187,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::get('get', [ProofReaderAssessmentsController::class, 'get'])->name('get');
                 Route::post('add', [ProofReaderAssessmentsController::class, 'add'])->name('add');
                 Route::get('get/audio/transcription', [ProofReaderAssessmentsController::class, 'getAudioTranscription'])->name('get.audio.transcription');
+                Route::post('update', [ProofReaderAssessmentsController::class, 'update'])->name('update');
             });
 
             Route::prefix('recruitment')->name('recruitment.')->group(function () {
@@ -222,8 +223,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('reject/{id}', [ProofReadingController::class, 'reject'])->name('reject');
             Route::get('pdf/download/{transcription}', [ReaderController::class, 'pdfDownload'])->name('pdf.download');
             Route::get('docx/download/{transcription}', [ReaderController::class, 'docxDownload'])->name('docx.download');
+            Route::get('invoice', [ProofReadingController::class, 'invoice'])->name('invoice');
+            Route::get('invoice/details/{id}', [ProofReadingController::class, 'invoiceDetails'])->name('invoice.details');
+            Route::get('invoice/download/{id}', [ProofReadingController::class, 'invoiceDownload'])->name('invoice.download');
+            Route::post('invoice/status/update/{id}', [ProofReadingController::class, 'statusUpdate'])->name('invoice.update.status');
         });
-        
     });
 });
 
@@ -307,6 +311,7 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
         Route::get('profile', [ReaderController::class, 'profile'])->name('profile');
         Route::post('profile/update', [ReaderController::class, 'profileUpdate'])->name('profile.update');
         Route::get('logout', [ReaderController::class, 'logout'])->name('logout');
+        Route::post('/bank-details/{id}', [ReaderController::class, 'bankDetails'])->name('bankDetails');
 
         Route::get('application', [ReaderController::class, 'applicationForm'])->name('application.form');
         Route::post('application/submit', [ReaderController::class, 'applicationSubmit'])->name('application.submit');

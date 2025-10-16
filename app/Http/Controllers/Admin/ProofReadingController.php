@@ -12,6 +12,7 @@ use App\Models\TaskClaimRecord;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
+use App\Models\ProofReadingInvoice;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 
@@ -69,6 +70,8 @@ class ProofReadingController extends Controller
     public function approve(Request $request, $id){
         try {
             $task = Task::find($id);
+            $user = $task->transcription->getUserName; // get user
+
             //document upload
             if ($request->hasFile('document')) {
                 $folder_path = public_path('proofreading/documents');
@@ -89,7 +92,6 @@ class ProofReadingController extends Controller
             $task->save();
 
             $amount = (int)$task->price;//Amount
-            $user = $task->transcription->getUserName; // get user
 
             //Store in wallet table
             $wallet             =  new Wallet();
@@ -111,6 +113,22 @@ class ProofReadingController extends Controller
             // update  user's Balance
             $user->balance -= $amount;
             $user->save();
+
+            //Proof Reader invoice update
+            $proofReadingInvoice = ProofReadingInvoice::where('proof_reader_id', $task->claimed_by)->where('month', date('M'))->where('year', date('Y'))->first();
+            if($proofReadingInvoice){
+                $proofReadingInvoice->amount = (int)$proofReadingInvoice->amount + (int)$amount;
+                $proofReadingInvoice->save();
+            }else{
+                $proofReadingInvoice                    = new ProofReadingInvoice();
+                $proofReadingInvoice->proof_reader_id   = $task->claimed_by;
+                $proofReadingInvoice->amount            = $amount;
+                $proofReadingInvoice->cf_amount         = 0;
+                $proofReadingInvoice->month             = date('M');
+                $proofReadingInvoice->year              = date('Y');
+                $proofReadingInvoice->status            = 0;
+                $proofReadingInvoice->save();
+            }
 
             alert()->success('success', 'Proof Reading Approved');
             return redirect()->back();
@@ -211,4 +229,62 @@ class ProofReadingController extends Controller
         return response()->download($path)->deleteFileAfterSend(true);
     }
 
+    public function invoice(Request $request){
+        if($request->month && $request->month!=''){
+            $filterMonth = $request->month;
+        }else{
+            $filterMonth = date('M');
+        }
+
+        if($request->year && $request->year!=''){
+            $filterYear = $request->year;
+        }else{
+            $filterYear = date('Y');
+        }
+
+        $currentYear    = now()->year;
+        $invoices       = ProofReadingInvoice::where('month', $filterMonth)->where('year', $filterYear)->paginate(20);
+        $months         = collect(range(1, 12))->map(fn($m) => date('M', mktime(0, 0, 0, $m, 1)))->toArray();
+        $years          = collect(range($currentYear - 2, $currentYear))->values()->toArray();
+        return view('admin.proofReading.invoice', compact('invoices','months','years','filterMonth', 'filterYear'));
+    }
+
+    public function invoiceDetails($id){
+        $invoice = ProofReadingInvoice::find($id);
+        $month = date('m', strtotime($invoice->month));
+        $year  = $invoice->year;
+        $tasks = Task::where('claimed_by', $invoice->proof_reader_id)->where('status', 'Completed')->whereYear('task_complete_time', $year)->whereMonth('task_complete_time', $month)->paginate(20);
+        return view('admin.proofReading.invoice_deatils', compact('invoice', 'tasks'));
+    }
+
+    public function invoiceDownload($id){
+        $invoice = ProofReadingInvoice::find($id);
+        $month = date('m', strtotime($invoice->month));
+        $year  = $invoice->year;
+        $tasks = Task::where('claimed_by', $invoice->proof_reader_id)->where('status', 'Completed')->whereYear('task_complete_time', $year)->whereMonth('task_complete_time', $month)->paginate(20);
+        $pdf = Pdf::loadView('admin.proofReading.invoice_pdf', compact('invoice','tasks'));
+        $fileName = $invoice->proofReader->fullName()."_".$invoice->month."_".$invoice->year ."_invoice.pdf";
+        return $pdf->download($fileName);
+    }
+
+    public function statusUpdate(Request $request, $id){
+        $invoice = ProofReadingInvoice::find($id);
+        if($request->status == 2){
+            $amount = (int)$invoice->amount + (int)$invoice->cf_amount;
+            $proofReadingInvoice                    = new ProofReadingInvoice();
+            $proofReadingInvoice->proof_reader_id   = $invoice->proof_reader_id;
+            $proofReadingInvoice->amount            = 0;
+            $proofReadingInvoice->cf_amount         = $amount;
+            $proofReadingInvoice->month             = date('M');
+            $proofReadingInvoice->year              = date('Y');
+            $proofReadingInvoice->status            = 0;
+            $proofReadingInvoice->save();
+        }else{
+            $invoice->status = 1;
+            $invoice->save();
+        }
+
+        alert()->success('success', 'Payment Status Updated');
+        return redirect()->back();
+    }
 }

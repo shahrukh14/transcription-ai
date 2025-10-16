@@ -85,7 +85,7 @@
                                     </a>
                                 </li>
                                 <li class="list-group-item">
-                                    <a href="{{ asset('user/audios/' . $task->transcription->audio_file_name) }}" title="Download Audio File"  download="{{$task->transcription->audio_file_original_name}}">
+                                    <a href="{{ asset('user/audios/' . $task->audio_name) }}" title="Download Audio File"  download="{{$task->audio_name}}">
                                         <i class="fa-solid fa-cloud-arrow-down"></i> Download Audio
                                     </a>
                                 </li>
@@ -172,7 +172,7 @@
     <div class="card" id="sticky-audio-player">
         <div class="card-body d-flex justify-content-center align-items-center">
             <div style="width: 53%; margin-left:8%;">
-                <h6 class="card-title text-center mb-0">{{ $task->transcription->audio_file_original_name }}</h6>
+                <h6 class="card-title text-center mb-0">{{ $task->audio_name }}</h6>
                 <audio id="plyr-audio-player" class="audio-player w-100" controls>
                     <source src="{{ asset('user/audios/' . $task->transcription->audio_file_name) }}" type="audio/mp3" />
                 </audio>
