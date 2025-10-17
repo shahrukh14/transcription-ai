@@ -209,7 +209,7 @@
                 <td>{{$index+1}}</td>
                 <td>{{$task->audio_name}}</td>
                 <td>{{ $task->claimed_dt ? \Carbon\Carbon::parse($task->claimed_dt)->format('d/m/Y') : '' }}</td>
-                <td>{{$task->price}}</td>
+                <td>{{number_format((float)$task->price, 2)}}</td>
               </tr>
               @empty
               <tr>

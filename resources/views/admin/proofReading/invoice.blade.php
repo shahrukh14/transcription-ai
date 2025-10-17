@@ -1,6 +1,9 @@
 @extends('admin.layouts.layout')
 @section('title', 'Invoice')
 @section('content')
+@php
+    $currency = '<i class="fas fa-indian-rupee-sign"></i>';
+@endphp
 <!-- BEGIN: Content-->
 <div class="app-content content ">
     <div class="content-overlay"></div>
@@ -54,9 +57,9 @@
                                         <thead>
                                             <tr>
                                                 <th class="text-nowrap">@lang('Proof Reader')</th>
-                                                <th class="text-nowrap">@lang('Amount')</th>
-                                                <th class="text-nowrap">@lang('CF Amount')</th>
-                                                <th class="text-nowrap">@lang('Total Amount')</th>
+                                                <th class="text-nowrap">@lang('Amount') {!! $currency !!}</th>
+                                                <th class="text-nowrap">@lang('CF Amountzz') {!! $currency !!}</th>
+                                                <th class="text-nowrap">@lang('Total Amount') {!! $currency !!}</th>
                                                 <th class="text-nowrap">@lang('Status')</th>
                                                 <th class="text-nowrap">@lang('Action')</th>
                                             </tr>
@@ -69,14 +72,16 @@
                                                     </td>
                                                     <td>{{$invoice->amount}}</td>
                                                     <td>{{$invoice->cf_amount}}</td>
-                                                    <td>{{((int)$invoice->amount + (int)$invoice->cf_amount)}}</td>
+                                                    <td>
+                                                        {{ number_format((float)($invoice->amount ?? 0) + (float)($invoice->cf_amount ?? 0), 2) }}
+                                                    </td>
                                                     <td>
                                                         @if ($invoice->status == 1)
                                                             <span class="badge rounded-pill badge-light-success me-1">Completed</span>
                                                         @elseif($invoice->status == 2)
                                                             <span class="badge rounded-pill badge-light-warning me-1">Carry Forwarded</span>
                                                         @else
-                                                            <span class="badge rounded-pill badge-light-secondary me-1">Pening</span>
+                                                            <span class="badge rounded-pill badge-light-secondary me-1">Pending</span>
                                                         @endif
                                                     </td>
                                                     <td>

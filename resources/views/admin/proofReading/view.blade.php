@@ -2,6 +2,9 @@
 @section('title', 'View Segments')
 
 @section('content')
+@php
+    $currency = '<i class="fas fa-indian-rupee-sign"></i>';
+@endphp
 <div class="app-content content ">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>

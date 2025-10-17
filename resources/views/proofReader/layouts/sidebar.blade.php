@@ -26,8 +26,14 @@
             </li>
             <li class="@if ((request()->is('proof-reader/tasks/my-task'))) active @endif nav-item">
                 <a class="d-flex align-items-center" href="{{ route('proof-reader.tasks.my.task') }}">
-                    <i class="fa-solid fa-list-check"></i>
+                    <i class="fa-solid fa-chalkboard-user"></i>
                     <span class="menu-title text-truncate font-size-12px" data-i18n="All Tasks">@lang('My Tasks')</span>
+                </a>
+            </li>
+            <li class="@if ((request()->is('proof-reader/tasks/invoice'))) active @endif nav-item">
+                <a class="d-flex align-items-center" href="{{ route('proof-reader.tasks.invoice') }}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span class="menu-title text-truncate font-size-12px" data-i18n="Invoice">@lang('Invoice')</span>
                 </a>
             </li>
             @else

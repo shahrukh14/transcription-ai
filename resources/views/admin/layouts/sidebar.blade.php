@@ -102,6 +102,14 @@
                             <span class="menu-title text-truncate font-size-12px">@lang('Recruitments')</span>
                         </a>
                     </li>
+
+                    {{-- Invoices --}}
+                    <li class="@if (request()->is('admin/proof-reading/invoice')) active @endif nav-item">
+                        <a class="d-flex align-items-center" href="{{ route('admin.proof-reading.invoice') }}">
+                            <i class="fa-solid fa-file-lines"></i>
+                            <span class="menu-title text-truncate font-size-12px" data-i18n="Invoices">@lang('Invoice')</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             
@@ -118,13 +126,6 @@
                 <a class="d-flex align-items-center" href="{{ route('admin.proof-reading.list') }}">
                     <i class="fa-solid fa-file-lines"></i>
                     <span class="menu-title text-truncate font-size-12px" data-i18n="Proof Reading">@lang('Proof Reading')</span>
-                </a>
-            </li>
-
-            <li class="@if (request()->is('admin/proof-reading/invoice')) active @endif nav-item">
-                <a class="d-flex align-items-center" href="{{ route('admin.proof-reading.invoice') }}">
-                    <i class="fa-solid fa-file-lines"></i>
-                    <span class="menu-title text-truncate font-size-12px" data-i18n="Invoices">@lang('Invoice')</span>
                 </a>
             </li>
 

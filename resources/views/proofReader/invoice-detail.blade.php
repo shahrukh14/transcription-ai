@@ -1,10 +1,9 @@
-@extends('admin.layouts.layout')
-@section('title', 'Invoice Details')
+@extends('proofReader.layouts.layout')
+@section('title', 'Invoice')
 @section('content')
 @php
     $currency = '<i class="fas fa-indian-rupee-sign"></i>';
 @endphp
-<!-- BEGIN: Content-->
 <div class="app-content content ">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
@@ -14,7 +13,7 @@
                 <div class="row breadcrumbs-top">
                     <div class="col-12 d-flex justify-content-between">
                         <h2 class="content-header-title float-start mb-0">@lang('Invoice Details')</h2>
-                        <a href="{{ route('admin.proof-reading.invoice.download', $invoice->id) }}" class="btn btn-outline-primary">Download Invoice</a>
+                        <a href="{{ route('proof-reader.tasks.invoice.pdf', $invoice->id) }}" class="btn btn-outline-primary">Download Invoice</a>
                     </div>
                     {{-- <a href="{{ asset($invoice->file) }}" target="_blank">View File</a> --}}
                 </div>
@@ -27,14 +26,13 @@
                         <div class="card">
                             <div class="card-header border-bottom d-flex justify-content-between">
                                 <h5 class="">Invoice Deatils</h5>
-                                <button class="btn btn-sm btn-outline-primary" id="updateBtn">Status</button>
                             </div>
                             <div class="card-body px-2 pt-1">
                                 <h4> Proof Reader : {{$invoice->proofReader->fullName()}}</h4>
                                 <h4> Month : {{$invoice->month}} - {{$invoice->year}}</h4>
                                 <h4> Amount :  {!! $currency !!} {{$invoice->amount}}</h4>
                                 <h4> CF Amount : {!! $currency !!} {{$invoice->cf_amount}}</h4>
-                                <h4> Total Amount : {!! $currency !!} {{((int)$invoice->amount + (int)$invoice->cf_amount)}}</h4>
+                                <h4> Total Amount : {!! $currency !!} {{ number_format((float)($invoice->amount ?? 0) + (float)($invoice->cf_amount ?? 0), 2) }}</h4>
                                 <h4> 
                                     Payment Status :
                                     @if ($invoice->status == 1)
@@ -69,7 +67,7 @@
                                                 <tr>
                                                     <td>{{$task->audio_name}}</td>
                                                     <td>{{ $task->claimed_dt ? \Carbon\Carbon::parse($task->claimed_dt)->format('d/m/Y') : '' }}</td>
-                                                    <td>{{$task->price}}</td>
+                                                    <td>{{number_format((float)$task->price, 2)}}</td>
                                                 </tr>
                                             @empty
                                             <tr class="text-center mt-4">
@@ -114,52 +112,4 @@
         </div>
     </div>
 </div>
-<!-- END: Content-->
 @endsection
-
-<!-- Update Modal-->
-<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form action="{{ route('admin.proof-reading.invoice.update.status', $invoice->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-header">
-                    <h4 class="modal-title text-center" id="updateModalLabel"><i class="fa-solid fa-pen-to-square"></i> Payment Status</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <select name="status" id="status" class="form-select">
-                                <option value="2">Carry Forword</option>
-                                <option value="1">Paid</option>
-                            </select>
-                            <br>
-
-                            <div class="form-label">File Upload</div>
-                            <input type="file" class="form-control" id="file" name="file"><br>
-
-                            <div class="form-label">Reamrk</div>
-                            <input type="text" class="form-control" id="remark" name="remark">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<!-- Update Modal Modal End-->
-
-@push('script')
-<script> 
-$(document).ready(function () {
-    $('#updateBtn').on('click', function (){
-        let modal = $('#updateModal');
-        modal.modal('show');
-    });
-});
-</script>
-@endpush

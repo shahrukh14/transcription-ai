@@ -223,7 +223,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('reject/{id}', [ProofReadingController::class, 'reject'])->name('reject');
             Route::get('pdf/download/{transcription}', [ReaderController::class, 'pdfDownload'])->name('pdf.download');
             Route::get('docx/download/{transcription}', [ReaderController::class, 'docxDownload'])->name('docx.download');
-            Route::get('invoice', [ProofReadingController::class, 'invoice'])->name('invoice');
+            Route::get('invoice', [ProofReadingController::class, 'invoice'])->name('invoice');//
             Route::get('invoice/details/{id}', [ProofReadingController::class, 'invoiceDetails'])->name('invoice.details');
             Route::get('invoice/download/{id}', [ProofReadingController::class, 'invoiceDownload'])->name('invoice.download');
             Route::post('invoice/status/update/{id}', [ProofReadingController::class, 'statusUpdate'])->name('invoice.update.status');
@@ -324,18 +324,22 @@ Route::prefix('proof-reader')->name('proof-reader.')->group(function () {
         Route::get('docx/download/{transcription}', [ReaderController::class, 'docxDownload'])->name('docx.download');
 
         
-        // Tasks Route
+        // Tasks Route//
         Route::prefix('tasks')->name('tasks.')->group(function () {
             Route::get('/', [TaskController::class, 'list'])->name('list');
             Route::get('/my-task', [TaskController::class, 'myTask'])->name('my.task');
             Route::get('claimed-by-proof-reader/{id}', [TaskController::class, 'claimedByProofReader'])->name('claimed.by.proof.reader');
+            Route::get('/invoice', [TaskController::class, 'invoice'])->name('invoice');
+            Route::get('invoice/detail/{id}', [TaskController::class, 'invoiceDetail'])->name('invoice.detail');
+            Route::get('invoice/pdf/{id}', [TaskController::class, 'invoicePdf'])->name('invoice.pdf');
+
             Route::get('view/{id}',[TaskController::class,'taskView'])->name('view');
             Route::post('add/segment/{id}', [TaskController::class, 'addSegment'])->name('segment.add');
             Route::post('update/{id}', [TaskController::class, 'updateTaskTranscription'])->name('update');
             Route::post('speaker-update/{id}', [TaskController::class, 'updateTranscriptionSpeaker'])->name('speaker.update');
             Route::post('speaker-rename', [TaskController::class, 'renameTranscriptionSpeaker'])->name('speaker.rename');
             Route::get('mark-as-complete/{id}', [TaskController::class, 'markAsComplete'])->name('mark-as-complete');
-             Route::get('transcription-get/{id}', [TaskController::class, 'getTranscription'])->name('transcription.get');
+            Route::get('transcription-get/{id}', [TaskController::class, 'getTranscription'])->name('transcription.get');
         });
     });
 });

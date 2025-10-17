@@ -5,6 +5,8 @@ namespace App\Http\Controllers\ProofReader;
 use Exception;
 use App\Models\Task;
 use App\Models\Transcription;
+use App\Models\ProofReadingInvoice;
+use App\Models\Generalsettings;
 use Illuminate\Http\Request;
 use App\Models\TaskClaimRecord;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class TaskController extends Controller
@@ -65,6 +68,57 @@ class TaskController extends Controller
         $tasks = $query->orderBy('created_at', 'DESC')->paginate(10);
         return view('proofReader.task.my_tasks', compact('tasks', 'search', 'from', 'to'));
     }
+
+    // Invoice list
+    public function invoice(Request $request)
+    {
+        $proofReaderId = auth()->id();
+
+        // Selected or current year
+        $filterYear = $request->year ?? date('Y');
+        $currentYear = now()->year;
+
+        // All months (Jan–Dec)
+        $months = collect(range(1, 12))
+            ->map(fn($m) => date('M', mktime(0, 0, 0, $m, 1)))
+            ->toArray();
+
+        // Get invoices for that proofreader & year
+        $invoices = ProofReadingInvoice::where('proof_reader_id', $proofReaderId)
+            ->where('year', $filterYear)
+            ->get();
+
+        // Group invoices by month
+        $invoiceByMonth = $invoices->keyBy('month');
+
+        // Year options
+        $years = collect(range($currentYear - 2, $currentYear))->values()->toArray();
+
+        return view('proofReader.invoice', compact('months', 'years', 'filterYear', 'invoiceByMonth'));
+    }
+    //invoice details page
+    public function invoiceDetail($id){
+        $invoice = ProofReadingInvoice::find($id);
+        $month = date('m', strtotime($invoice->month));
+        $year  = $invoice->year;
+        $tasks = Task::where('claimed_by', $invoice->proof_reader_id)->where('status', 'Completed')->whereYear('task_complete_time', $year)->whereMonth('task_complete_time', $month)->paginate(20);
+        return view('proofReader.invoice-detail', compact('invoice', 'tasks'));
+    }
+    //invoice pdf download
+    public function invoicePdf($id){
+        $invoice = ProofReadingInvoice::find($id);
+        $month = date('m', strtotime($invoice->month));
+        $year  = $invoice->year;
+        $tasks = Task::where('claimed_by', $invoice->proof_reader_id)->where('status', 'Completed')->whereYear('task_complete_time', $year)->whereMonth('task_complete_time', $month)->paginate(20);
+        $settings = Generalsettings::first();
+        $pdf = Pdf::loadView('proofReader.invoice-pdf', compact('invoice','tasks', 'settings'));
+        $fileName = $invoice->proofReader->fullName()."_".$invoice->month."_".$invoice->year ."_invoice.pdf";
+        return $pdf->stream($fileName);
+    }
+    // public function invoicePdf()
+    // {
+    //     return view('proofReader.invoice-detail');
+    // }
 
     public function claimedByProofReader(Request $request, $id)
     {
