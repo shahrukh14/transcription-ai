@@ -61,12 +61,17 @@ composer install
 ```
 
 3️⃣ Configure Environment
-
+- Set your databse name databse username and password in uout **.env** file.
 
 4️⃣ Run Migrations and Seeders
 ```bash
 php artisan migrate
 php artisan db:seed
+```
+
+5️⃣ Run the development server 
+```bash
+php artisan serve
 ```
 
 🧾 Usage Workflow
